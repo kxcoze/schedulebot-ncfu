@@ -11,7 +11,6 @@ def get_cursor():
     return cursor
 
 def init_db():
-    print("EXECUTING")
     cursor.execute("""CREATE TABLE IF NOT EXISTS users(
         user_id TEXT PRIMARY KEY,
         group_code INT,
@@ -28,29 +27,6 @@ def init_db():
         CONSTRAINT pk PRIMARY KEY (institute_name, speciality_name, group_name));
     """)
     conn.commit()
-
-def insert_user_with_schedule(data):
-    # data[0] - user_id, data[1] - group_code, data[2] - notifications, data[3] - schedule
-    cursor.execute("INSERT INTO users VALUES (?,?,?,?);", data)
-    conn.commit()
-
-def update_user_schedule(data):
-    pass
-
-def update_user_group_code(data):
-    # data[0] - group_code, data[1] - user_id
-    cursor.execute("UPDATE users SET group_code = (?) WHERE user_id = (?);", tuple(data))
-    conn.commit()
-
-def get_users():
-    cursor.execute("SELECT * FROM users;")
-    results = cursor.fetchall()
-    print(results)
-
-def get_group_code(data):
-    cursor.execute(f"SELECT group_code FROM univer_code WHERE group_name = '{data}';")
-    result = cursor.fetchone()
-    print(result)
 
 def insert_codes(data):
     # [0] - Институт, [1] - Специальность, [2] - Группа, [3] - Код группы
@@ -70,24 +46,54 @@ def insert_codes(data):
                 except:
                     print("ALREADY HAS")
 
+def insert(*args):
+    table = args[0]
+    data = tuple(args[1:5])
+    cursor.execute(f"INSERT INTO {table} VALUES (?,?,?,?);", data)
+    conn.commit()
+
+def update(*args):
+    table = args[0]
+    detected = args[1]
+    to_change = args[2]
+    item = args[3]
+    value = args[4]
+    cursor.execute(f"UPDATE {table} SET {detected} = {to_change} WHERE {item} = {value};")
+    conn.commit()
+
+def get(*args):
+    detected = args[0]
+    table = args[1]
+    item = args[2]
+    value = args[3]
+    cursor.execute(f"SELECT {detected} FROM {table} WHERE {item} = '{value}';")
+    result = cursor.fetchone()
+    if result:
+        return result[0]
+    else:
+        return -1
+
+def delete_table(table):
+    cursor.execute(f"DROP TABLE {table};")
+    conn.commit()
+
+def delete(*args):
+    table = args[0]
+    item = args[1]
+    value = args[2]
+    cursor.execute(f"DELETE FROM {table} WHERE {item} = {value}")
+    conn.commit()
 
 def check_db_exists():
     cursor.execute("SELECT name FROM sqlite_master "
                    "WHERE type='table' AND name='users'")
-    #cursor.execute("DROP TABLE users")
-    #conn.commit()
+    conn.commit()
     table_exists = cursor.fetchall()
     if table_exists:
-        print("EXIST")
-        #insert_user()
-        #get_users()
-        #insert_codes(parseSchedule.get_codes())
-        while True:   
-            get_group_code(input().lower())
-        #update_user_group_code([22222, '43284'])
+        #insert('users', '229', 0, 0, 'empty')
+        #print(get('group_code', 'users', 'user_id', 229))
         return
     init_db()
 
 
-if __name__ == '__main__':
-    check_db_exists()
+check_db_exists()

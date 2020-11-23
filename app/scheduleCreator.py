@@ -82,15 +82,30 @@ class WriterInFiles:
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=4, ensure_ascii=False)
 
-def main():
-    code_group = input()
+def get_formatted_schedule(code_group):
     url = 'https://ecampus.ncfu.ru/schedule/group/' + code_group
     parser = Parser()
     jsParser = SelParser(url)
-    writer = WriterInFiles()
     html = jsParser.get_data_from_url()
-    #htmlwojs = parse.get_html(url)
-    writer.write_in_json(parser.get_schedule(html))
+    schedule = parser.get_schedule(html)
+    formatted_schedule = ''
+    for day in schedule:
+        formatted_schedule += ''.join(day['weekday']+', '+day['date']+'\n')
+        for lesson in day['lessons']:
+            groupNumber = ''
+            if lesson['groupNumber'] != '':
+                groupNumber = lesson['groupNumber']+', '
+            
+            eof = '\n'
+            if lesson == day['lessons'][-1]:
+                eof = '\n\n'
+            formatted_schedule += ''.join(lesson['number']+', '+lesson['lessonName']+', '
+                                    +lesson['lessonType']+', '+groupNumber
+                                    +lesson['teacherName']+eof)
+    #print(formatted_schedule)
+    writer = WriterInFiles()
+    writer.write_in_txt(formatted_schedule)
+    return formatted_schedule
 
 if __name__ == '__main__':
-    main()
+    get_formatted_schedule(input())

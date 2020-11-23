@@ -1,187 +1,197 @@
 [
     {
         "weekday": "Понедельник",
-        "date": "16 ноября",
+        "date": "23 ноября",
         "lessons": [
             {
-                "number": "1",
-                "lessonName": "Общая педагогика",
-                "audName": "9-519",
-                "lessonType": "Практическое занятие",
-                "groupNumber": "1, 2",
-                "teacherName": "Григорьева Любовь Владимировна"
-            },
-            {
-                "number": "2",
-                "lessonName": "Общая педагогика",
-                "audName": "9-519",
-                "lessonType": "Практическое занятие",
-                "groupNumber": "1, 2",
-                "teacherName": "Григорьева Любовь Владимировна"
-            },
-            {
                 "number": "3",
-                "lessonName": "Английский язык",
-                "audName": "9-421",
-                "lessonType": "Практическое занятие для самостоятельного изучения",
-                "groupNumber": "",
-                "teacherName": "Дубровина Светлана Николаевна"
+                "lessonName": "Теория формальных языков и грамматик",
+                "audName": "9-320",
+                "lessonType": "Лабораторная работа",
+                "groupNumber": "2",
+                "teacherName": "Бережной Виктор Васильевич"
             },
             {
                 "number": "4",
-                "lessonName": "Английский язык",
-                "audName": "9-421",
+                "lessonName": "Дискретная математика",
+                "audName": "9-112",
                 "lessonType": "Практическое занятие",
-                "groupNumber": "2",
-                "teacherName": "Дубровина Светлана Николаевна"
+                "groupNumber": "",
+                "teacherName": "Бережной Виктор Васильевич"
+            },
+            {
+                "number": "5",
+                "lessonName": "Основы научно-исследовательской работы",
+                "audName": "9-112",
+                "lessonType": "Практическое занятие",
+                "groupNumber": "",
+                "teacherName": "Макоха Анатолий Николаевич"
+            },
+            {
+                "number": "6",
+                "lessonName": "Теория формальных языков и грамматик",
+                "audName": "9-326",
+                "lessonType": "Лабораторная работа",
+                "groupNumber": "1",
+                "teacherName": "Бережной Виктор Васильевич"
             }
         ]
     },
     {
         "weekday": "Вторник",
-        "date": "17 ноября",
+        "date": "24 ноября",
         "lessons": [
             {
                 "number": "2",
-                "lessonName": "Информационно-коммуникационные технологии в образовании",
-                "audName": "9-429",
-                "lessonType": "Лабораторная работа",
-                "groupNumber": "1",
-                "teacherName": "Герасимова Елена Константиновна"
-            },
-            {
-                "number": "3",
-                "lessonName": "Английский язык",
-                "audName": "9-414",
+                "lessonName": "Управление карьерой",
+                "audName": "9-112",
                 "lessonType": "Практическое занятие",
-                "groupNumber": "2",
-                "teacherName": "Дубровина Светлана Николаевна"
+                "groupNumber": "",
+                "teacherName": "Ярцева Елена Павловна"
             },
             {
                 "number": "3",
-                "lessonName": "Введение в профессиональную деятельность",
-                "audName": "9-429",
+                "lessonName": "Основы проектной деятельности",
+                "audName": "9-320",
+                "lessonType": "Лабораторная работа",
+                "groupNumber": "2",
+                "teacherName": "Шапошников Алексей Вячеславович"
+            },
+            {
+                "number": "3",
+                "lessonName": "Языки и методы программирования",
+                "audName": "9-330",
                 "lessonType": "Лабораторная работа",
                 "groupNumber": "1",
-                "teacherName": "Панкратова Ольга Петровна"
+                "teacherName": "Непретимова Елена Владимировна"
             },
             {
                 "number": "4",
-                "lessonName": "Информационно-коммуникационные технологии в образовании",
-                "audName": "9-528",
+                "lessonName": "Основы проектной деятельности",
+                "audName": "9-503",
+                "lessonType": "Лабораторная работа",
+                "groupNumber": "1",
+                "teacherName": "Шапошников Алексей Вячеславович"
+            },
+            {
+                "number": "4",
+                "lessonName": "Языки и методы программирования",
+                "audName": "9-330",
                 "lessonType": "Лабораторная работа",
                 "groupNumber": "2",
-                "teacherName": "Герасимова Елена Константиновна"
+                "teacherName": "Непретимова Елена Владимировна"
             }
         ]
     },
     {
         "weekday": "Среда",
-        "date": "18 ноября",
+        "date": "25 ноября",
         "lessons": [
             {
-                "number": "4",
-                "lessonName": "Общая педагогика",
-                "audName": "ВКС",
-                "lessonType": "Лекция",
-                "groupNumber": "",
-                "teacherName": "Харченко Галина Ивановна"
+                "number": "1",
+                "lessonName": "Физика",
+                "audName": "2-230",
+                "lessonType": "Лабораторная работа",
+                "groupNumber": "1",
+                "teacherName": "Бондаренко Елена Александровна"
             },
             {
-                "number": "5",
-                "lessonName": "Цифровая грамотность и обработка больших данных",
-                "audName": "ВКС",
-                "lessonType": "Лекция",
+                "number": "2",
+                "lessonName": "Физика",
+                "audName": "2-222",
+                "lessonType": "Практическое занятие",
                 "groupNumber": "",
-                "teacherName": "Конопко Екатерина Александровна"
+                "teacherName": "Бондаренко Елена Александровна"
+            },
+            {
+                "number": "3",
+                "lessonName": "Личность в пространстве российской цивилизации",
+                "audName": "2-311",
+                "lessonType": "Практическое занятие",
+                "groupNumber": "",
+                "teacherName": "Хачатрян Лилит Вачагановна"
+            },
+            {
+                "number": "4",
+                "lessonName": "Физика",
+                "audName": "2-230",
+                "lessonType": "Лабораторная работа",
+                "groupNumber": "2",
+                "teacherName": "Бондаренко Елена Александровна"
             }
         ]
     },
     {
         "weekday": "Четверг",
-        "date": "19 ноября",
+        "date": "26 ноября",
         "lessons": [
             {
-                "number": "2",
-                "lessonName": "Цифровая грамотность и обработка больших данных",
-                "audName": "20-512",
-                "lessonType": "Лабораторная работа",
-                "groupNumber": "1",
-                "teacherName": "Конопко Екатерина Александровна"
-            },
-            {
                 "number": "3",
-                "lessonName": "Математика",
-                "audName": "20-111",
+                "lessonName": "Иностранный язык в профессиональной сфере (английский язык)",
+                "audName": "9-432",
                 "lessonType": "Практическое занятие",
-                "groupNumber": "1, 2",
-                "teacherName": "Махринова Марина Владимировна"
+                "groupNumber": "",
+                "teacherName": "Ерина Лариса Сергеевна"
             },
             {
                 "number": "4",
-                "lessonName": "Цифровая грамотность и обработка больших данных",
-                "audName": "20-512",
-                "lessonType": "Лабораторная работа",
-                "groupNumber": "2",
-                "teacherName": "Конопко Екатерина Александровна"
+                "lessonName": "Математический анализ",
+                "audName": "9-406",
+                "lessonType": "Практическое занятие",
+                "groupNumber": "",
+                "teacherName": "Роженко Ольга Дмитриевна"
+            },
+            {
+                "number": "5",
+                "lessonName": "Иностранный язык в профессиональной сфере (русский язык)",
+                "audName": "9-509Б",
+                "lessonType": "Практическое занятие",
+                "groupNumber": "",
+                "teacherName": "Желябова Ирина Викторовна"
             }
         ]
     },
     {
         "weekday": "Пятница",
-        "date": "20 ноября",
+        "date": "27 ноября",
         "lessons": [
             {
-                "number": "3",
-                "lessonName": "Русский язык и культура речи",
-                "audName": "9-509Б",
-                "lessonType": "Практическое занятие",
-                "groupNumber": "1, 2",
-                "teacherName": "Протасова Наталия Владимировна"
+                "number": "4",
+                "lessonName": "Основы научно-исследовательской работы",
+                "audName": "ВКС",
+                "lessonType": "Лекция",
+                "groupNumber": "",
+                "teacherName": "Макоха Анатолий Николаевич"
             },
             {
-                "number": "4",
-                "lessonName": "Введение в языкознание",
-                "audName": "9-519",
-                "lessonType": "Практическое занятие",
-                "groupNumber": "1, 2",
-                "teacherName": "Лизенко Инна Игоревна"
+                "number": "5",
+                "lessonName": "Языки и методы программирования",
+                "audName": "ВКС",
+                "lessonType": "Лекция",
+                "groupNumber": "",
+                "teacherName": "Непретимова Елена Владимировна"
             }
         ]
     },
     {
         "weekday": "Суббота",
-        "date": "21 ноября",
+        "date": "28 ноября",
         "lessons": [
-            {
-                "number": "1",
-                "lessonName": "Информационно-коммуникационные технологии в образовании",
-                "audName": "ВКС",
-                "lessonType": "Лекция",
-                "groupNumber": "",
-                "teacherName": "Герасимова Елена Константиновна"
-            },
             {
                 "number": "2",
-                "lessonName": "Русский язык и культура речи",
+                "lessonName": "Физика",
                 "audName": "ВКС",
                 "lessonType": "Лекция",
                 "groupNumber": "",
-                "teacherName": "Протасова Наталия Владимировна"
-            }
-        ]
-    },
-    {
-        "weekday": "Вторник",
-        "date": "1 декабря",
-        "lessons": [
+                "teacherName": "Бондаренко Елена Александровна"
+            },
             {
                 "number": "3",
-                "lessonName": "Английский язык",
-                "audName": "9-414",
-                "lessonType": "Практическое занятие",
-                "groupNumber": "2",
-                "teacherName": "Дубровина Светлана Николаевна"
+                "lessonName": "Основы проектной деятельности",
+                "audName": "ВКС",
+                "lessonType": "Лекция",
+                "groupNumber": "",
+                "teacherName": "Шапошников Алексей Вячеславович"
             }
         ]
     }
