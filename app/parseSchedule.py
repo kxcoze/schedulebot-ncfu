@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup as BS4
-from scheduleCreator import WriterInFiles
 
+from selScrapingNCFU import SelScrapingSchedule
 
 class ParserSchedule:
     def __init__(self, html):
@@ -11,7 +11,7 @@ class ParserSchedule:
         soup = BS4(self.html, 'lxml')
         institutes = soup.find('div', id='institutes').find_all('div',class_ = 'panel panel-default', recursive=False)
         
-        data_for_university = []
+        data_from_schedule = []
         for institute in institutes:
             instituteName = institute.find('div', class_='panel-heading').find('span').text.strip()
             data_instit = {'instituteName':instituteName, 'specialities':[]}
@@ -31,26 +31,17 @@ class ParserSchedule:
 
                     data_specialities['groups'].append(data_groups)
                 data_instit['specialities'].append(data_specialities)
-            data_for_university.append(data_instit)
+            data_from_schedule.append(data_instit)
 
                 
-        return data_for_university
+        return data_from_schedule
 
 
+def get_codes():
+    schedule = SelScrapingSchedule()    
+    while not schedule.html:    
+        schedule.get_html_from_schedule()
+   
+    parser = ParserSchedule(schedule.html)
 
-
-
-
-
-def main():
-    html = ''
-    with open('schedule.html') as f:
-        html = f.read()
-    writer = WriterInFiles()
-    parser = ParserSchedule(html)
-    json_data = parser.get_data()
-    
-    writer.write_in_json(json_data, 'university_codes.json')
-
-if __name__ == '__main__':
-    main()
+    return parser.get_data()

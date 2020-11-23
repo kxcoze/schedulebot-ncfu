@@ -25,6 +25,8 @@ async def initializebot(message: types.Message):
 
 @dp.message_handler(commands=['help'])
 async def send_help_commands(message: types.Message):
+    #print(message.from_user.id)
+    print(str(message.chat.id))
     """Вывод всех возможных команд бота"""
     await message.answer(
             "Список команд: \n"
