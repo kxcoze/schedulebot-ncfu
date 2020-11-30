@@ -9,7 +9,6 @@ from aiogram.dispatcher import FSMContext
 import db
 import scheduleCreator as SC
 
-
 API_TOKEN = '1458781343:AAEN9-LvDZeOKa3fn738zgDpqVssqFIJ-Ok'
 
 
@@ -29,18 +28,18 @@ async def initializebot(message: types.Message):
             "Привет! \n"
             "Я бот для расписаний СКФУ! \n"
             "Для команд просмотра всех команд наберите /help \n"
-            "Powered by aiogram.")
+            "<em>Powered by aiogram.</em>", parse_mode='HTML')
 
 
 @dp.message_handler(commands=['help'])
 async def send_help_commands(message: types.Message):
-    #print(message.from_user.id)
-    #print(str(message.chat.id))
     """Вывод всех возможных команд бота"""
     await message.answer(
             "Список команд: \n"
-            "/setGroup - Составить личное расписание занятий \n"
-            "/schedule - Посмотреть текущее расписание на неделю \n"
+            "/setgroup - Ввод группы для показа расписания \n"
+            "/today - Посмотреть расписание на сегодня \n"
+            "/tommorow или /tom - Посмотреть расписание на завтра \n"
+            "/week - Посмотреть расписание на неделю \n"
             "/notifyMe - Подписаться на уведомления о начале пары \n"
             "/stopNotifyMe - Отписаться от уведомлений ")
 
@@ -64,25 +63,29 @@ async def wait_for_group_name(message: types.Message, state: FSMContext):
 
     group_code = db.get('group_code', 'univer_code', 'group_name', group_name)
     if not group_code == -1:
+        schedule = SC.insert_db_json_schedule(group_code)
         try:
-            db.insert('users', message.chat.id, group_code, 0, '')
+            db.insert('users', message.chat.id, group_code, 0, schedule)
         except db.sqlite3.IntegrityError:
             db.update('users', 'group_code', group_code, 'user_id', message.chat.id)    
+            db.update('users', 'schedule', schedule, 'user_id', message.chat.id)
         await message.answer("Успешно!")
     else: 
         await message.reply("Введенная группа не существует, попробуйте снова")
     await state.finish()
 
 
-@dp.message_handler(commands=['schedule'])
+@dp.message_handler(commands=['week', 'today', 'tommorow', 'tom'])
 async def make_user_schedule(message: types.Message):
+    command = re.compile('/\w+').search(message.text).group()[1:]
     group_code = db.get('group_code', 'users', 'user_id', message.chat.id)
     if not group_code == -1:
-        schedule = SC.get_formatted_schedule(str(group_code))
-        await message.answer("<b><em>Расписание занятий на текущую неделю</em></b>\n\n"
-                             + schedule, parse_mode='HTML')
+        if command == 'tom':
+            command = 'tommorow'
+        schedule = SC.get_formatted_schedule(message.chat.id, command)
+        await message.answer(schedule, parse_mode='HTML')
     else:
-        await message.reply("Похоже Вы не выбрали группу перед тем как составить расписание, пожалуйста, воспользуйтесь командой /setGroup и укажите Вашу группу.")
+        await message.reply("Похоже что Вы не выбрали группу перед тем как посмотреть расписание, пожалуйста, воспользуйтесь командой /setGroup и укажите Вашу группу")
 
 @dp.message_handler(commands=['notifyMe'])
 async def set_user_notification(message: types.Message):
@@ -91,6 +94,21 @@ async def set_user_notification(message: types.Message):
 @dp.message_handler(commands=['stopNotifyMe'])
 async def stop_user_notification(message: types.Message):
     pass
+
+@dp.message_handler(commands=[])
+async def print_commands(message: types.Message):
+    await message.answer()
+
+"""
+@dp.message_handler(commands=['magic'])
+async def show_animation(message: types.Message):
+    
+    ans = "Загрузка данных начата! "
+    mes_bot = await bot.send_message(message.chat.id, ans+'|')
+    
+    for i in animation.anim():
+        await bot.edit_message_text(chat_id=message.chat.id,message_id=mes_bot.message_id,text=(ans+i))
+"""
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)

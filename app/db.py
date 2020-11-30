@@ -1,10 +1,10 @@
 import os
 
-import json
 import sqlite3
 import parseSchedule
 
 conn = sqlite3.connect(os.path.join("db", "users_codes.db"))
+
 cursor = conn.cursor()
 
 def get_cursor():
@@ -17,7 +17,6 @@ def init_db():
         notifications INT,
         schedule TEXT);
     """)
-    
 
     cursor.execute("""CREATE TABLE IF NOT EXISTS univer_code(
         institute_name TEXT,
@@ -26,6 +25,7 @@ def init_db():
         group_code INT,
         CONSTRAINT pk PRIMARY KEY (institute_name, speciality_name, group_name));
     """)
+
     conn.commit()
 
 def insert_codes(data):
@@ -58,7 +58,9 @@ def update(*args):
     to_change = args[2]
     item = args[3]
     value = args[4]
-    cursor.execute(f"UPDATE {table} SET {detected} = {to_change} WHERE {item} = {value};")
+    cursor.execute(f"UPDATE {table} SET {detected} = ? WHERE {item} = ?", (to_change, value))
+    #cursor.execute(f"UPDATE {table} SET {detected} = " + to_change +
+    #              f"WHERE {item} = {value};")
     conn.commit()
 
 def get(*args):
@@ -66,7 +68,7 @@ def get(*args):
     table = args[1]
     item = args[2]
     value = args[3]
-    cursor.execute(f"SELECT {detected} FROM {table} WHERE {item} = '{value}';")
+    cursor.execute(f"SELECT {detected} FROM {table} WHERE {item} = '{value}'")
     result = cursor.fetchone()
     if result:
         return result[0]
@@ -90,8 +92,6 @@ def check_db_exists():
     conn.commit()
     table_exists = cursor.fetchall()
     if table_exists:
-        #insert('users', '229', 0, 0, 'empty')
-        #print(get('group_code', 'users', 'user_id', 229))
         return
     init_db()
 

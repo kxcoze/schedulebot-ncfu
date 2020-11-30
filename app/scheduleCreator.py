@@ -4,6 +4,9 @@ from typing import List
 import requests
 import json
 import csv
+from datetime import datetime
+
+import db
 
 # Used for parsing data from html code
 class Parser:
@@ -82,30 +85,64 @@ class WriterInFiles:
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=4, ensure_ascii=False)
 
-def get_formatted_schedule(code_group):
-    url = 'https://ecampus.ncfu.ru/schedule/group/' + code_group
+def insert_db_json_schedule(code_group):
+    url = f'https://ecampus.ncfu.ru/schedule/group/{code_group}'
     parser = Parser()
     jsParser = SelParser(url)
     html = jsParser.get_data_from_url()
     schedule = parser.get_schedule(html)
-    formatted_schedule = ''
-    for day in schedule:
+    js = json.dumps(schedule, ensure_ascii=False)
+    return js
+    """
+    try:
+        db.insert('users', user_id, code_group, 0, js) 
+    except:
+        db.update('users', 'schedule', js, 'user_id', user_id)
+    """
+
+def get_formatted_schedule(user_id, range):
+    schedulejs = json.loads(db.get('schedule', 'users', 'user_id', user_id))
+    today = datetime.today().isoweekday()-1
+    tom = 0 if today + 1 > 6 else today + 1
+    date_dict = {'today': today, 'tommorow': tom, 'week': -1}
+    weekdays = {-1: 'Неделя',
+                0 : 'Понедельник',
+                1 : 'Вторник',
+                2 : 'Среда',
+                3 : 'Четверг',
+                4 : 'Пятница',
+                5 : 'Суббота',
+                6 : 'Воскресенье'}
+    date_to_operate = weekdays[date_dict[range]]
+
+    if date_to_operate == 'Воскресенье':
+        return 'Шуруй отдыхать, сегодня выходной!'
+    elif range == 'week':
+        weekday = 'неделю'
+    elif range == 'today':
+        weekday = 'сегодня'
+        schedulejs = [x for x in schedulejs if x['weekday'] == date_to_operate]
+    elif range == 'tommorow':
+        weekday = 'завтра'
+        schedulejs = [x for x in schedulejs if x['weekday'] == date_to_operate]
+
+    formatted_schedule = f'<b><em>Расписание занятий на {weekday}</em></b>\n\n'
+    for day in schedulejs:
         formatted_schedule += ''.join(day['weekday']+', '+day['date']+'\n')
         for lesson in day['lessons']:
             groupNumber = ''
             if lesson['groupNumber'] != '':
-                groupNumber = lesson['groupNumber']+', '
+                groupNumber = lesson['groupNumber']+'-ая подгруппа, '
             
-            eof = '\n'
+            eod = '\n'
             if lesson == day['lessons'][-1]:
-                eof = '\n\n'
-            formatted_schedule += ''.join(lesson['number']+', '+lesson['lessonName']+', '
-                                    +lesson['lessonType']+', '+groupNumber
-                                    +lesson['teacherName']+eof)
-    #print(formatted_schedule)
-    writer = WriterInFiles()
-    writer.write_in_txt(formatted_schedule)
+                eod = '\n\n'
+
+            formatted_schedule += ''.join(lesson['number']+' пара, '+lesson['lessonName']+', '
+                                    +lesson['audName']+', '+lesson['lessonType']+', '+groupNumber
+                                    +lesson['teacherName']+eod)
     return formatted_schedule
 
 if __name__ == '__main__':
-    get_formatted_schedule(input())
+    #get_json_schedule(input())
+    get_formatted_schedule(input(), input())

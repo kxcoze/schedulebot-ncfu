@@ -1,0 +1,831 @@
+1606654741958	geckodriver	INFO	Listening on 127.0.0.1:57039
+1606654742897	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile3OCTIR"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606654748382	Marionette	INFO	Listening on port 40271
+1606654748671	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+console.info: MINT: Loading search-config defaults.
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+1606654751232	Marionette	INFO	Stopped listening on port 40271
+console.log: "RemoteSettingsWorker error: Error: Can't import when we've started shutting down."
+JavaScript error: resource://gre/modules/NewTabUtils.jsm, line 686: NS_ERROR_UNEXPECTED: Component returned failure code: 0x8000ffff (NS_ERROR_UNEXPECTED) [nsINavHistoryService.asyncExecuteLegacyQuery]
+console.error: "Could not load engine yahoo@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine startpage@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine duckduckgo@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine wikipedia@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+1606654791115	geckodriver	INFO	Listening on 127.0.0.1:38343
+1606654791122	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile6REEcI"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606654794321	Marionette	INFO	Listening on port 37267
+1606654794359	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+1606654796606	Marionette	INFO	Stopped listening on port 37267
+
+###!!! [Parent][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+1606654908577	geckodriver	INFO	Listening on 127.0.0.1:40003
+1606654908583	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileuU4PLr"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606654911852	Marionette	INFO	Listening on port 45895
+1606654911921	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606654914209	Marionette	INFO	Stopped listening on port 45895
+JavaScript error: resource://gre/modules/NewTabUtils.jsm, line 686: NS_ERROR_UNEXPECTED: Component returned failure code: 0x8000ffff (NS_ERROR_UNEXPECTED) [nsINavHistoryService.asyncExecuteLegacyQuery]
+1606654925730	geckodriver	INFO	Listening on 127.0.0.1:60769
+1606654925736	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilect7dqI"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606654928859	Marionette	INFO	Listening on port 35095
+1606654928970	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606654930940	Marionette	INFO	Stopped listening on port 35095
+console.warn: services.settings: main/message-groups sync interrupted by shutdown
+console.error: (new Error("Connection closed before committing the transaction.", "resource://gre/modules/Sqlite.jsm", 688))
+console.log: "RemoteSettingsWorker error: Error: Can't import when we've started shutting down."
+console.info: MINT: Loading search-config defaults.
+console.error: SearchService: "_init: failure initializing search:" (void 0)
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500037
+JavaScript error: resource://gre/modules/SearchService.jsm, line 207: NS_ERROR_FAILURE: SearchService previously failed to initialize
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500037
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500037
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500037
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500037
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500037
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500037
+console.error: SearchSettings: "_write: Could not write to settings file:" (new Error("cannot write without any engine.", "resource://gre/modules/SearchSettings.jsm", 211))
+console.log: "RemoteSettingsWorker error: Error: Can't import when we've started shutting down."
+console.log: "RemoteSettingsWorker error: Error: Can't import when we've started shutting down."
+console.log: "RemoteSettingsWorker error: Error: Can't import when we've started shutting down."
+JavaScript error: resource://gre/modules/ExtensionSettingsStore.jsm, line 123: Error: The ExtensionSettingsStore was accessed before the initialize promise resolved.
+1606655014710	geckodriver	INFO	Listening on 127.0.0.1:37015
+1606655014716	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileYqh8hE"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606655018018	Marionette	INFO	Listening on port 43277
+1606655018052	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+1606655020182	Marionette	INFO	Stopped listening on port 43277
+
+###!!! [Parent][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+1606660536875	geckodriver	INFO	Listening on 127.0.0.1:60025
+1606660536882	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilepYN5YF"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606660540122	Marionette	INFO	Listening on port 40771
+1606660540233	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606660542150	Marionette	INFO	Stopped listening on port 40771
+console.log: "RemoteSettingsWorker error: Error: Can't import when we've started shutting down."
+console.error: "Could not load engine yahoo@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine startpage@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine duckduckgo@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine wikipedia@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/NewTabUtils.jsm, line 686: NS_ERROR_UNEXPECTED: Component returned failure code: 0x8000ffff (NS_ERROR_UNEXPECTED) [nsINavHistoryService.asyncExecuteLegacyQuery]
+1606660626435	geckodriver	INFO	Listening on 127.0.0.1:35489
+1606660626442	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilelObuPi"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606660629562	Marionette	INFO	Listening on port 37623
+1606660629680	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606660631919	Marionette	INFO	Stopped listening on port 37623
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+console.error: "Could not load engine duckduckgo@search.mozilla.org: TypeError: AddonManagerInternal._getProviderByName(...) is undefined"
+console.error: "Could not load engine wikipedia@search.mozilla.org: TypeError: AddonManagerInternal._getProviderByName(...) is undefined"
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: resource://gre/modules/DeferredTask.jsm, line 215: Error: Unable to arm timer, the object has been finalized.
+JavaScript error: resource://gre/modules/DeferredTask.jsm, line 215: Error: Unable to arm timer, the object has been finalized.
+JavaScript error: resource://gre/modules/DeferredTask.jsm, line 215: Error: Unable to arm timer, the object has been finalized.
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/NewTabUtils.jsm, line 686: NS_ERROR_UNEXPECTED: Component returned failure code: 0x8000ffff (NS_ERROR_UNEXPECTED) [nsINavHistoryService.asyncExecuteLegacyQuery]
+1606660687323	geckodriver	INFO	Listening on 127.0.0.1:55033
+1606660687329	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileB0DWVV"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606660690580	Marionette	INFO	Listening on port 45495
+1606660690668	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+1606660692876	Marionette	INFO	Stopped listening on port 45495
+1606660871625	geckodriver	INFO	Listening on 127.0.0.1:47331
+1606660871631	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile5E5ysZ"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606660874798	Marionette	INFO	Listening on port 36211
+1606660874867	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606660876998	Marionette	INFO	Stopped listening on port 36211
+console.log: "RemoteSettingsWorker error: Error: Can't import when we've started shutting down."
+console.log: "RemoteSettingsWorker error: Error: Can't import when we've started shutting down."
+JavaScript error: resource://gre/modules/NewTabUtils.jsm, line 686: NS_ERROR_UNEXPECTED: Component returned failure code: 0x8000ffff (NS_ERROR_UNEXPECTED) [nsINavHistoryService.asyncExecuteLegacyQuery]
+console.error: "Could not load engine yahoo@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine startpage@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine duckduckgo@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine wikipedia@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: resource://gre/modules/ExtensionSettingsStore.jsm, line 123: Error: The ExtensionSettingsStore was accessed before the initialize promise resolved.
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+1606660981955	geckodriver	INFO	Listening on 127.0.0.1:34345
+1606660981962	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileoeh7xG"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606660985337	Marionette	INFO	Listening on port 43325
+1606660985397	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606660988530	Marionette	INFO	Stopped listening on port 43325
+1606661215887	geckodriver	INFO	Listening on 127.0.0.1:45365
+1606661215894	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileLKhvPK"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606661218894	Marionette	INFO	Listening on port 40989
+1606661218930	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+1606661221005	Marionette	INFO	Stopped listening on port 40989
+console.error: "Could not load engine duckduckgo@search.mozilla.org: TypeError: AddonManagerInternal._getProviderByName(...) is undefined"
+console.error: "Could not load engine wikipedia@search.mozilla.org: TypeError: AddonManagerInternal._getProviderByName(...) is undefined"
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: resource://gre/modules/DeferredTask.jsm, line 215: Error: Unable to arm timer, the object has been finalized.
+JavaScript error: resource://gre/modules/DeferredTask.jsm, line 215: Error: Unable to arm timer, the object has been finalized.
+JavaScript error: resource://gre/modules/DeferredTask.jsm, line 215: Error: Unable to arm timer, the object has been finalized.
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+1606661293727	geckodriver	INFO	Listening on 127.0.0.1:59695
+1606661293734	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilertDHge"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606661296951	Marionette	INFO	Listening on port 43485
+1606661297068	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606661299209	Marionette	INFO	Stopped listening on port 43485
+console.error: services.settings: 
+  main/fxmonitor-breaches Signature failed  TypeError: NetworkError when attempting to fetch resource.
+console.error: services.settings: 
+  main/partitioning-exempt-urls Signature failed  TypeError: NetworkError when attempting to fetch resource.
+console.error: "Could not load engine startpage@search.mozilla.org: Error: Attempt to use XPI database when it is not initialized"
+console.error: "Could not load engine duckduckgo@search.mozilla.org: TypeError: AddonManagerInternal._getProviderByName(...) is undefined"
+console.error: "Could not load engine wikipedia@search.mozilla.org: TypeError: AddonManagerInternal._getProviderByName(...) is undefined"
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: resource://gre/modules/DeferredTask.jsm, line 215: Error: Unable to arm timer, the object has been finalized.
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/NewTabUtils.jsm, line 686: NS_ERROR_UNEXPECTED: Component returned failure code: 0x8000ffff (NS_ERROR_UNEXPECTED) [nsINavHistoryService.asyncExecuteLegacyQuery]
+1606661465500	geckodriver	INFO	Listening on 127.0.0.1:53523
+1606661465507	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile8rDxHc"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606661468709	Marionette	INFO	Listening on port 34367
+1606661468742	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+1606661471424	Marionette	INFO	Stopped listening on port 34367
+
+###!!! [Parent][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+1606661762752	geckodriver	INFO	Listening on 127.0.0.1:34385
+1606661762758	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileWu6fYh"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606661765896	Marionette	INFO	Listening on port 40733
+1606661765998	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606661767929	Marionette	INFO	Stopped listening on port 40733
+console.info: MINT: Loading search-config defaults.
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+console.log: "RemoteSettingsWorker error: Error: Can't import when we've started shutting down."
+JavaScript error: resource://gre/modules/NewTabUtils.jsm, line 686: NS_ERROR_UNEXPECTED: Component returned failure code: 0x8000ffff (NS_ERROR_UNEXPECTED) [nsINavHistoryService.asyncExecuteLegacyQuery]
+console.error: "Could not load engine yahoo@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine startpage@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine duckduckgo@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine wikipedia@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+1606662771820	geckodriver	INFO	Listening on 127.0.0.1:47147
+1606662771827	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileo8uIE9"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606662775093	Marionette	INFO	Listening on port 42331
+1606662775160	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606662777248	Marionette	INFO	Stopped listening on port 42331
+console.error: "Could not load engine duckduckgo@search.mozilla.org: Error: Attempt to use XPI database when it is not initialized"
+console.error: "Could not load engine wikipedia@search.mozilla.org: TypeError: AddonManagerInternal._getProviderByName(...) is undefined"
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+1606662809467	geckodriver	INFO	Listening on 127.0.0.1:41761
+1606662809473	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilee0RVOU"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606662812622	Marionette	INFO	Listening on port 45301
+1606662812716	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606662814784	Marionette	INFO	Stopped listening on port 45301
+console.error: (new Error("Connection closed before committing the transaction.", "resource://gre/modules/Sqlite.jsm", 688))
+console.error: "Could not load engine yahoo@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine startpage@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine duckduckgo@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine wikipedia@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+1606663000977	geckodriver	INFO	Listening on 127.0.0.1:41757
+1606663000984	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile0veaVT"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606663004085	Marionette	INFO	Listening on port 41845
+1606663004128	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606663006584	Marionette	INFO	Stopped listening on port 41845
+console.error: "Could not load engine startpage@search.mozilla.org: Error: Attempt to use XPI database when it is not initialized"
+console.error: "Could not load engine duckduckgo@search.mozilla.org: TypeError: AddonManagerInternal._getProviderByName(...) is undefined"
+console.error: "Could not load engine wikipedia@search.mozilla.org: TypeError: AddonManagerInternal._getProviderByName(...) is undefined"
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: resource://gre/modules/DeferredTask.jsm, line 215: Error: Unable to arm timer, the object has been finalized.
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+1606663031423	geckodriver	INFO	Listening on 127.0.0.1:46913
+1606663031429	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileMMWr86"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606663034592	Marionette	INFO	Listening on port 43991
+1606663034669	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606663036885	Marionette	INFO	Stopped listening on port 43991
+console.error: (new Error("Connection closed before committing the transaction.", "resource://gre/modules/Sqlite.jsm", 688))
+console.log: "RemoteSettingsWorker error: Error: Can't import when we've started shutting down."
+console.log: "RemoteSettingsWorker error: Error: Can't import when we've started shutting down."
+console.error: "Could not load engine yahoo@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine startpage@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine duckduckgo@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine wikipedia@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: resource://gre/modules/ExtensionSettingsStore.jsm, line 123: Error: The ExtensionSettingsStore was accessed before the initialize promise resolved.
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+
+###!!! [Parent][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+1606663077233	geckodriver	INFO	Listening on 127.0.0.1:52943
+1606663077240	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilelT6Zdv"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606663080668	Marionette	INFO	Listening on port 44997
+1606663080783	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+1606663082752	Marionette	INFO	Stopped listening on port 44997
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: , line 0: uncaught exception: 2147500036
+JavaScript error: , line 0: uncaught exception: 2147500036
+JavaScript error: , line 0: uncaught exception: 2147500036
+JavaScript error: , line 0: uncaught exception: 2147500036
+JavaScript error: , line 0: uncaught exception: 2147500036
+JavaScript error: , line 0: uncaught exception: 2147500036
+JavaScript error: , line 0: uncaught exception: 2147500036
+1606663116321	geckodriver	INFO	Listening on 127.0.0.1:32965
+1606663116328	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilexV0Rr4"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606663119444	Marionette	INFO	Listening on port 44933
+1606663119561	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606663121736	Marionette	INFO	Stopped listening on port 44933
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+1606663234961	geckodriver	INFO	Listening on 127.0.0.1:54047
+1606663234968	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofiled5rT81"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606663237997	Marionette	INFO	Listening on port 38671
+1606663238111	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606663240098	Marionette	INFO	Stopped listening on port 38671
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+console.error: "Could not load engine duckduckgo@search.mozilla.org: TypeError: AddonManagerInternal._getProviderByName(...) is undefined"
+console.error: "Could not load engine wikipedia@search.mozilla.org: TypeError: AddonManagerInternal._getProviderByName(...) is undefined"
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: resource://gre/modules/DeferredTask.jsm, line 215: Error: Unable to arm timer, the object has been finalized.
+JavaScript error: resource://gre/modules/DeferredTask.jsm, line 215: Error: Unable to arm timer, the object has been finalized.
+JavaScript error: resource://gre/modules/DeferredTask.jsm, line 215: Error: Unable to arm timer, the object has been finalized.
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/NewTabUtils.jsm, line 686: NS_ERROR_UNEXPECTED: Component returned failure code: 0x8000ffff (NS_ERROR_UNEXPECTED) [nsINavHistoryService.asyncExecuteLegacyQuery]
+
+###!!! [Parent][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+1606663270061	geckodriver	INFO	Listening on 127.0.0.1:34117
+1606663270068	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileMrb5t6"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606663273131	Marionette	INFO	Listening on port 41291
+1606663273207	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606663277509	Marionette	INFO	Stopped listening on port 41291
+1606663413858	geckodriver	INFO	Listening on 127.0.0.1:38275
+1606663413862	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileN7CH4C"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606663417136	Marionette	INFO	Listening on port 42365
+1606663417195	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606663419179	Marionette	INFO	Stopped listening on port 42365
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: , line 0: uncaught exception: 2147500036
+JavaScript error: , line 0: uncaught exception: 2147500036
+JavaScript error: , line 0: uncaught exception: 2147500036
+JavaScript error: , line 0: uncaught exception: 2147500036
+JavaScript error: , line 0: uncaught exception: 2147500036
+JavaScript error: , line 0: uncaught exception: 2147500036
+JavaScript error: , line 0: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/NewTabUtils.jsm, line 686: NS_ERROR_UNEXPECTED: Component returned failure code: 0x8000ffff (NS_ERROR_UNEXPECTED) [nsINavHistoryService.asyncExecuteLegacyQuery]
+1606663455271	geckodriver	INFO	Listening on 127.0.0.1:49739
+1606663455278	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilelCH54S"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606663458146	Marionette	INFO	Listening on port 37481
+1606663458212	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606663460203	Marionette	INFO	Stopped listening on port 37481
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+JavaScript error: resource://gre/modules/NewTabUtils.jsm, line 686: NS_ERROR_UNEXPECTED: Component returned failure code: 0x8000ffff (NS_ERROR_UNEXPECTED) [nsINavHistoryService.asyncExecuteLegacyQuery]
+console.log: "RemoteSettingsWorker error: Error: Can't import when we've started shutting down."
+console.error: "Could not load engine yahoo@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine startpage@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine duckduckgo@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine wikipedia@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+
+###!!! [Parent][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+1606663468049	geckodriver	INFO	Listening on 127.0.0.1:59449
+1606663468056	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile80E7Qm"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606663471175	Marionette	INFO	Listening on port 44969
+1606663471288	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606663473306	Marionette	INFO	Stopped listening on port 44969
+1606663510171	geckodriver	INFO	Listening on 127.0.0.1:49839
+1606663510178	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilelZ29ut"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606663513249	Marionette	INFO	Listening on port 40671
+1606663513312	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606663515245	Marionette	INFO	Stopped listening on port 40671
+console.error: services.settings: 
+  main/message-groups Signature failed  TypeError: NetworkError when attempting to fetch resource.
+console.error: services.settings: 
+  main/partitioning-exempt-urls Signature failed  RemoteSettingsWorkerError: Remote Settings has shut down.
+1606663793554	geckodriver	INFO	Listening on 127.0.0.1:36147
+1606663793560	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileiZUfuj"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606663796498	Marionette	INFO	Listening on port 34647
+1606663796603	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+1606663798558	Marionette	INFO	Stopped listening on port 34647
+console.error: "Could not load engine startpage@search.mozilla.org: Error: Attempt to use XPI database when it is not initialized"
+console.error: "Could not load engine duckduckgo@search.mozilla.org: TypeError: AddonManagerInternal._getProviderByName(...) is undefined"
+console.error: "Could not load engine wikipedia@search.mozilla.org: TypeError: AddonManagerInternal._getProviderByName(...) is undefined"
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: resource://gre/modules/DeferredTask.jsm, line 215: Error: Unable to arm timer, the object has been finalized.
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/NewTabUtils.jsm, line 686: NS_ERROR_UNEXPECTED: Component returned failure code: 0x8000ffff (NS_ERROR_UNEXPECTED) [nsINavHistoryService.asyncExecuteLegacyQuery]
+1606663808287	geckodriver	INFO	Listening on 127.0.0.1:56185
+1606663808294	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilehdZc3D"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606663811375	Marionette	INFO	Listening on port 40377
+1606663811432	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606663813647	Marionette	INFO	Stopped listening on port 40377
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: , line 0: uncaught exception: 2147500036
+JavaScript error: , line 0: uncaught exception: 2147500036
+JavaScript error: , line 0: uncaught exception: 2147500036
+JavaScript error: , line 0: uncaught exception: 2147500036
+JavaScript error: , line 0: uncaught exception: 2147500036
+JavaScript error: , line 0: uncaught exception: 2147500036
+JavaScript error: , line 0: uncaught exception: 2147500036
+1606663862226	geckodriver	INFO	Listening on 127.0.0.1:41531
+1606663862230	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofiletG5rF2"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606663865441	Marionette	INFO	Listening on port 35285
+1606663865565	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+1606663867852	Marionette	INFO	Stopped listening on port 35285
+console.warn: services.settings: main/cfr-fxa sync interrupted by shutdown
+1606663982907	geckodriver	INFO	Listening on 127.0.0.1:59739
+1606663982913	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileSc3APs"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606663986020	Marionette	INFO	Listening on port 45665
+1606663986067	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+1606663988153	Marionette	INFO	Stopped listening on port 45665
+console.error: "Could not load engine duckduckgo@search.mozilla.org: Error: Attempt to use XPI database when it is not initialized"
+console.error: "Could not load engine wikipedia@search.mozilla.org: TypeError: AddonManagerInternal._getProviderByName(...) is undefined"
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+1606664066776	geckodriver	INFO	Listening on 127.0.0.1:53237
+1606664066781	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilem4iPCw"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606664069991	Marionette	INFO	Listening on port 33719
+1606664070114	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606664072083	Marionette	INFO	Stopped listening on port 33719
+JavaScript error: resource://gre/modules/NewTabUtils.jsm, line 686: NS_ERROR_UNEXPECTED: Component returned failure code: 0x8000ffff (NS_ERROR_UNEXPECTED) [nsINavHistoryService.asyncExecuteLegacyQuery]
+console.error: "Could not load engine yahoo@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine startpage@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine duckduckgo@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine wikipedia@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+
+###!!! [Parent][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+1606664262932	geckodriver	INFO	Listening on 127.0.0.1:36949
+1606664262939	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileq2MLoX"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606664266218	Marionette	INFO	Listening on port 44681
+1606664266275	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606664268430	Marionette	INFO	Stopped listening on port 44681
+console.error: "Could not load engine startpage@search.mozilla.org: Error: Attempt to use XPI database when it is not initialized"
+console.error: "Could not load engine duckduckgo@search.mozilla.org: TypeError: AddonManagerInternal._getProviderByName(...) is undefined"
+console.error: "Could not load engine wikipedia@search.mozilla.org: TypeError: AddonManagerInternal._getProviderByName(...) is undefined"
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: resource://gre/modules/DeferredTask.jsm, line 215: Error: Unable to arm timer, the object has been finalized.
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+1606668444801	geckodriver	INFO	Listening on 127.0.0.1:45907
+1606668444807	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile8Pw2FH"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606668449693	Marionette	INFO	Listening on port 43253
+1606668449951	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606668452474	Marionette	INFO	Stopped listening on port 43253
+console.error: "Could not load engine yahoo@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine startpage@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine duckduckgo@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine wikipedia@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+
+###!!! [Parent][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+1606687059474	geckodriver	INFO	Listening on 127.0.0.1:51241
+1606687059481	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileovlyon"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606687062640	Marionette	INFO	Listening on port 40537
+1606687062721	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606687064956	Marionette	INFO	Stopped listening on port 40537
+console.error: "Could not load engine wikipedia@search.mozilla.org: Error: Attempt to use XPI database when it is not initialized"
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/NewTabUtils.jsm, line 686: NS_ERROR_UNEXPECTED: Component returned failure code: 0x8000ffff (NS_ERROR_UNEXPECTED) [nsINavHistoryService.asyncExecuteLegacyQuery]
+1606687066275	geckodriver	INFO	Listening on 127.0.0.1:48989
+1606687066280	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilew6esv6"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606687069466	Marionette	INFO	Listening on port 35605
+1606687069516	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+console.info: MINT: Loading search-config defaults.
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+1606687071799	Marionette	INFO	Stopped listening on port 35605
+console.error: "Could not load engine yahoo@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine startpage@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine duckduckgo@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine wikipedia@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+
+###!!! [Parent][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+
+###!!! [Parent][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+1606688257175	geckodriver	INFO	Listening on 127.0.0.1:52957
+1606688257181	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile4GTeLy"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606688260484	Marionette	INFO	Listening on port 39901
+1606688260522	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606688262668	Marionette	INFO	Stopped listening on port 39901
+console.log: "RemoteSettingsWorker error: Error: Can't import when we've started shutting down."
+JavaScript error: resource://gre/modules/NewTabUtils.jsm, line 686: NS_ERROR_UNEXPECTED: Component returned failure code: 0x8000ffff (NS_ERROR_UNEXPECTED) [nsINavHistoryService.asyncExecuteLegacyQuery]
+console.error: "Could not load engine yahoo@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine startpage@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine duckduckgo@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine wikipedia@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+1606696835698	geckodriver	INFO	Listening on 127.0.0.1:59775
+1606696835703	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilefuiR20"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606696838876	Marionette	INFO	Listening on port 36717
+1606696838941	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+console.info: MINT: Loading search-config defaults.
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+1606696841249	Marionette	INFO	Stopped listening on port 36717
+console.log: "RemoteSettingsWorker error: Error: Can't import when we've started shutting down."
+JavaScript error: resource://gre/modules/NewTabUtils.jsm, line 686: NS_ERROR_UNEXPECTED: Component returned failure code: 0x8000ffff (NS_ERROR_UNEXPECTED) [nsINavHistoryService.asyncExecuteLegacyQuery]
+console.error: "Could not load engine yahoo@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine startpage@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine duckduckgo@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.error: "Could not load engine wikipedia@search.mozilla.org: [Exception... \"AddonManager is not initialized\"  nsresult: \"0xc1f30001 (NS_ERROR_NOT_INITIALIZED)\"  location: \"JS frame :: resource://gre/modules/AddonManager.jsm :: installBuiltinAddon :: line 2550\"  data: no]"
+console.warn: SearchService: "_init: abandoning init due to shutting down"
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 554: uncaught exception: 2147500036
+1606696918102	geckodriver	INFO	Listening on 127.0.0.1:43501
+1606696918107	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileiM1MCQ"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1606696921288	Marionette	INFO	Listening on port 40609
+1606696921345	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1606696923489	Marionette	INFO	Stopped listening on port 40609
+JavaScript error: resource://gre/modules/NewTabUtils.jsm, line 686: NS_ERROR_UNEXPECTED: Component returned failure code: 0x8000ffff (NS_ERROR_UNEXPECTED) [nsINavHistoryService.asyncExecuteLegacyQuery]
