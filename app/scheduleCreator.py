@@ -1,9 +1,12 @@
 from bs4 import BeautifulSoup as BS4
 from selenium import webdriver
 from typing import List
+
+import asyncio
 import requests
 import json
 import csv
+
 from datetime import datetime
 
 import db
@@ -89,19 +92,16 @@ def insert_db_json_schedule(code_group):
     url = f'https://ecampus.ncfu.ru/schedule/group/{code_group}'
     parser = Parser()
     jsParser = SelParser(url)
+
     html = jsParser.get_data_from_url()
+
     schedule = parser.get_schedule(html)
+
     js = json.dumps(schedule, ensure_ascii=False)
     return js
-    """
-    try:
-        db.insert('users', user_id, code_group, 0, js) 
-    except:
-        db.update('users', 'schedule', js, 'user_id', user_id)
-    """
 
 def get_formatted_schedule(user_id, range):
-    schedulejs = json.loads(db.get('schedule', 'users', 'user_id', user_id))
+    schedulejs = json.loads(db.get('users', 'schedule', 'user_id', user_id))
     today = datetime.today().isoweekday()-1
     tom = 0 if today + 1 > 6 else today + 1
     date_dict = {'today': today, 'tommorow': tom, 'week': -1}
@@ -116,7 +116,7 @@ def get_formatted_schedule(user_id, range):
     date_to_operate = weekdays[date_dict[range]]
 
     if date_to_operate == 'Воскресенье':
-        return 'Шуруй отдыхать, сегодня выходной!'
+        return "<b><em>Вы запросили расписание на воскресенье, может быть стоит отдохнуть?</em></b>"
     elif range == 'week':
         weekday = 'неделю'
     elif range == 'today':
@@ -126,23 +126,84 @@ def get_formatted_schedule(user_id, range):
         weekday = 'завтра'
         schedulejs = [x for x in schedulejs if x['weekday'] == date_to_operate]
 
+
+
+    user_subgroup = db.get('users', 'subgroup', 'user_id', user_id)
+    flag = True
+    copied_schedulejs = []
+    for ind, day in enumerate(schedulejs):
+        copied_schedulejs.append({'weekday': day['weekday'],
+                                  'date': day['date'],
+                                  'lessons': []})
+        for lesson in day['lessons']:
+            for group_number in lesson['groupNumber'].split(', '):
+                if group_number == user_subgroup:
+                    flag = False
+                    copied_schedulejs[ind]['lessons'].append(lesson)
+                elif group_number == '':
+                    copied_schedulejs[ind]['lessons'].append(lesson)
+
+    if not len(copied_schedulejs) > 0:
+        return f"<b><em>На {weekday} доступного расписания нету!</em></b>"
+    elif flag:
+        copied_schedulejs = schedulejs
+
+    schedule_bell = _get_schedule_bell_ncfu()
     formatted_schedule = f'<b><em>Расписание занятий на {weekday}</em></b>\n\n'
-    for day in schedulejs:
-        formatted_schedule += ''.join(day['weekday']+', '+day['date']+'\n')
+    for day in copied_schedulejs:
+        formatted_schedule += ''.join('<b>'+day['weekday']+', '+day['date']+'</b>\n')
         for lesson in day['lessons']:
             groupNumber = ''
-            if lesson['groupNumber'] != '':
-                groupNumber = lesson['groupNumber']+'-ая подгруппа, '
-            
-            eod = '\n'
-            if lesson == day['lessons'][-1]:
-                eod = '\n\n'
+            if flag and lesson['groupNumber'] != '':
+                groupNumber = lesson['groupNumber']+'-я подгруппа, '
 
-            formatted_schedule += ''.join(lesson['number']+' пара, '+lesson['lessonName']+', '
-                                    +lesson['audName']+', '+lesson['lessonType']+', '+groupNumber
+            eod = '\n\n'
+            if lesson == day['lessons'][-1]:
+                eod = '\n\n\n'
+            
+            lessonType = ', '
+            if lesson['lessonType'] != 'Лекция':
+                lessonT = lesson['lessonType'].split()
+                for i in lessonT:
+                    lessonType += i[0].upper()
+            else:
+                lessonType = ''
+
+            formatted_schedule += ''.join(lesson['number']+' пара '+'<em>('+schedule_bell[lesson['number']]+')</em>\n'
+                                    +lesson['lessonName']
+                                    +', '+lesson['audName']
+                                    +lessonType+', '
+                                    +groupNumber
                                     +lesson['teacherName']+eod)
     return formatted_schedule
 
+def get_formatted_schedule_bell():
+    bell = _get_schedule_bell_ncfu()
+    formatted_bell = '<b><em>Расписание звонков СКФУ</em></b>\n'
+
+    for k, v in bell.items():
+        if not k.isdigit():
+            formatted_bell += k.split(',')[0] + ' \t'
+        else:
+            formatted_bell += k + ' пара \t\t\t'
+        formatted_bell += v + '\n'
+
+    return formatted_bell
+
+def _get_schedule_bell_ncfu():
+    bell = {'1': '8:00 - 9:30',
+            '2': '9:40 - 11:10',
+            '3': '11:20 - 12:50',
+            'Большая перемена, 30 минут': '12:50 - 13:20',
+            '4': '13:20 - 14:50',
+            '5': '15:00 - 16:30',
+            'Большая перемена, 20 минут': '16:30 - 16:50',
+            '6': '16:50 - 18:20',
+            '7': '18:30 - 20:00',
+            '8': '20:10 - 21:40'}
+    return bell
+
 if __name__ == '__main__':
     #get_json_schedule(input())
-    get_formatted_schedule(input(), input())
+    #get_formatted_schedule(input(), input())
+    print(get_formatted_schedule_bell())

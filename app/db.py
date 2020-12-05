@@ -3,7 +3,7 @@ import os
 import sqlite3
 import parseSchedule
 
-conn = sqlite3.connect(os.path.join("db", "users_codes.db"))
+conn = sqlite3.connect(os.path.join("db", "users_codes.db"), check_same_thread=False)
 
 cursor = conn.cursor()
 
@@ -14,6 +14,7 @@ def init_db():
     cursor.execute("""CREATE TABLE IF NOT EXISTS users(
         user_id TEXT PRIMARY KEY,
         group_code INT,
+        subgroup TEXT, 
         notifications INT,
         schedule TEXT);
     """)
@@ -46,28 +47,28 @@ def insert_codes(data):
                 except:
                     print("ALREADY HAS")
 
-def insert(*args):
-    table = args[0]
-    data = tuple(args[1:5])
-    cursor.execute(f"INSERT INTO {table} VALUES (?,?,?,?);", data)
+def insert(table, *args):
+    values = tuple(args)
+    placeholders = ', '.join('?' * len(values))
+    cursor.execute(f"INSERT INTO {table} VALUES ({placeholders})", values)
     conn.commit()
 
-def update(*args):
-    table = args[0]
-    detected = args[1]
-    to_change = args[2]
-    item = args[3]
-    value = args[4]
-    cursor.execute(f"UPDATE {table} SET {detected} = ? WHERE {item} = ?", (to_change, value))
+def update(table, data, item, value):
+    # data - List -> List[0] - to_change, List[1] - value
+    for comb in data:
+        detected, to_change = comb[0], comb[1]
+        cursor.execute(f"UPDATE {table} SET {detected} = ? WHERE {item} = ?", (to_change, value))
+        conn.commit()
     #cursor.execute(f"UPDATE {table} SET {detected} = " + to_change +
     #              f"WHERE {item} = {value};")
-    conn.commit()
 
-def get(*args):
+def update_many(table, *args):
+    pass
+
+def get(table, *args):
     detected = args[0]
-    table = args[1]
-    item = args[2]
-    value = args[3]
+    item = args[1]
+    value = args[2]
     cursor.execute(f"SELECT {detected} FROM {table} WHERE {item} = '{value}'")
     result = cursor.fetchone()
     if result:
@@ -76,13 +77,12 @@ def get(*args):
         return -1
 
 def delete_table(table):
-    cursor.execute(f"DROP TABLE {table};")
+    cursor.execute(f"DROP TABLE {table}")
     conn.commit()
 
-def delete(*args):
-    table = args[0]
-    item = args[1]
-    value = args[2]
+def delete(table, *args):
+    item = args[0]
+    value = args[1]
     cursor.execute(f"DELETE FROM {table} WHERE {item} = {value}")
     conn.commit()
 
