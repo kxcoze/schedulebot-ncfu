@@ -1,7 +1,8 @@
 import os
 
 import sqlite3
-import parseSchedule
+
+import parsingSchedule
 
 conn = sqlite3.connect(os.path.join("db", "users_codes.db"), check_same_thread=False)
 
@@ -26,10 +27,20 @@ def init_db():
         group_code INT,
         CONSTRAINT pk PRIMARY KEY (institute_name, speciality_name, group_name));
     """)
-
+        
     conn.commit()
 
-def insert_codes(data):
+
+def insert_codes():
+    try:
+        delete_table('univer_code')
+    except:
+        # Succesfully deleted
+        pass
+    finally:
+        init_db()
+
+    data = parsingSchedule.get_codes()
     # [0] - Институт, [1] - Специальность, [2] - Группа, [3] - Код группы
     data_to_insert = ['','','','']
     for item in data:
@@ -39,13 +50,13 @@ def insert_codes(data):
             for group in speciality['groups']:
                 data_to_insert[2] = group['groupName'].lower()
                 data_to_insert[3] = group['groupCode'].lower()
-                
+                # Возможно стоит отправлять результаты вставки в логи?
                 try:
-                    print(data_to_insert)
+                    print("NEW DATA -> ", data_to_insert)
                     cursor.execute("INSERT INTO univer_code VALUES (?,?,?,?)", tuple(data_to_insert))
                     conn.commit()
                 except:
-                    print("ALREADY HAS")
+                    print("ALREADY HAS -> ", data_to_insert)
 
 def insert(table, *args):
     values = tuple(args)
@@ -54,16 +65,11 @@ def insert(table, *args):
     conn.commit()
 
 def update(table, data, item, value):
-    # data - List -> List[0] - to_change, List[1] - value
+    # type(data) - List -> List[0] - to_change, List[1] - value
     for comb in data:
         detected, to_change = comb[0], comb[1]
         cursor.execute(f"UPDATE {table} SET {detected} = ? WHERE {item} = ?", (to_change, value))
         conn.commit()
-    #cursor.execute(f"UPDATE {table} SET {detected} = " + to_change +
-    #              f"WHERE {item} = {value};")
-
-def update_many(table, *args):
-    pass
 
 def get(table, *args):
     detected = args[0]
@@ -75,6 +81,18 @@ def get(table, *args):
         return result[0]
     else:
         return -1
+
+def fetchall(table, columns):
+    columns_joined = ', '.join(columns)
+    cursor.execute(f"SELECT {columns_joined} FROM {table}")
+    rows = cursor.fetchall()
+    result = []
+    for row in rows:
+        dict_row = {}
+        for index, column in enumerate(columns):
+            dict_row[column] = row[index]
+        result.append(dict_row)
+    return result
 
 def delete_table(table):
     cursor.execute(f"DROP TABLE {table}")

@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup as BS4
 from selenium import webdriver
 from typing import List
 
+import threading
 import asyncio
 import requests
 import json
@@ -60,7 +61,7 @@ class SelParser:
     
     def get_data_from_url(self):
         options = webdriver.FirefoxOptions()
-        options.add_argument('--headless')
+        #options.add_argument('--headless')
         browser = webdriver.Firefox(options=options)
         browser.get(self.URL)
         html = browser.page_source
@@ -90,15 +91,25 @@ class WriterInFiles:
 
 def insert_db_json_schedule(code_group):
     url = f'https://ecampus.ncfu.ru/schedule/group/{code_group}'
-    parser = Parser()
-    jsParser = SelParser(url)
 
+    jsParser = SelParser(url)
     html = jsParser.get_data_from_url()
 
+    parser = Parser()
     schedule = parser.get_schedule(html)
 
     js = json.dumps(schedule, ensure_ascii=False)
     return js
+
+def update_schedule_user(user_id, group_code, group_subnum):
+    schedule = insert_db_json_schedule(group_code)
+    try:    
+        db.insert('users', user_id, group_code, group_subnum, 0, schedule)    
+    except db.sqlite3.IntegrityError:    
+        db.update('users', [['group_code', group_code],                  
+                            ['schedule', schedule],     
+                            ['subgroup', group_subnum]], 'user_id', user_id) 
+
 
 def get_formatted_schedule(user_id, range):
     schedulejs = json.loads(db.get('users', 'schedule', 'user_id', user_id))
