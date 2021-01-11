@@ -26,6 +26,7 @@ def update_schedules_users():
             continue
         # print("SUCCESS")
 
+
 def prepare_receivers(cur_lesson):
     cur_time = datetime.today().weekday()
     if cur_time == 6:
@@ -48,7 +49,7 @@ def prepare_receivers(cur_lesson):
 
     receivers = []
     for sub in subscribers:
-        schedulejs = json.loads(db.get('users', 'schedule', 'user_id', sub['user_id']))
+        schedulejs = json.loads(db.get('users', 'schedule_cur_week', 'user_id', sub['user_id']))
         flag = True    
         copied_schedulejs = []    
         for ind, day in enumerate(schedulejs):    
@@ -132,7 +133,11 @@ def schedule_for_tasks():
 def _main():
     loop = asyncio.new_event_loop()
     schedule_for_tasks()
-    off_thread = threading.Thread(target=start_background_eventloop, args=(loop,), name='schedule_thread').start()
+    off_thread = threading.Thread(
+            target=start_background_eventloop, args=(loop,), 
+            name='schedule_thread',
+            daemon=True,
+    ).start()
     asyncio.run_coroutine_threadsafe(run_continuous(), loop)
 
 if __name__ == '__main__':

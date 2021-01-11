@@ -1,6 +1,6 @@
 import os
-
 import sqlite3
+import threading
 
 import parsingSchedule
 
@@ -8,8 +8,27 @@ conn = sqlite3.connect(os.path.join("db", "users_codes.db"), check_same_thread=F
 
 cursor = conn.cursor()
 
+lock = threading.Lock()
+
+def lock_thread(main_thread=False):
+    def decorator(func):
+
+        def wrapper(*args, **kwargs):
+            if main_thread or threading.current_thread() is not threading.main_thread():
+                lock.acquire(True)
+            return_value = func(*args, **kwargs)
+            try:
+                lock.release()
+            finally:
+                return return_value
+
+        return wrapper
+    return decorator
+
+
 def get_cursor():
     return cursor
+
 
 def init_db():
     cursor.execute("""CREATE TABLE IF NOT EXISTS users(
@@ -17,7 +36,9 @@ def init_db():
         group_code INT,
         subgroup TEXT, 
         notifications INT,
-        schedule TEXT);
+        schedule_cur_week TEXT,
+        schedule_next_week TEXT,
+        link TEXT);
     """)
 
     cursor.execute("""CREATE TABLE IF NOT EXISTS univer_code(
@@ -31,6 +52,7 @@ def init_db():
     conn.commit()
 
 
+@lock_thread(main_thread=True)
 def insert_codes():
     try:
         delete_table('univer_code')
@@ -58,18 +80,26 @@ def insert_codes():
                 except:
                     print("ALREADY HAS -> ", data_to_insert)
 
+
 def insert(table, *args):
     values = tuple(args)
     placeholders = ', '.join('?' * len(values))
     cursor.execute(f"INSERT INTO {table} VALUES ({placeholders})", values)
     conn.commit()
 
+
+def insert_new_user(user_id):
+    cursor.execute(f"INSERT INTO users VALUES({user_id}, -1, 0, 0, '', '', '[]')")
+    conn.commit()
+
+
 def update(table, data, item, value):
-    # type(data) - List -> List[0] - to_change, List[1] - value
-    for comb in data:
-        detected, to_change = comb[0], comb[1]
+    # type(data)->Tuple -> List[0] - to_change, List[1] - value
+    for pair in data:
+        detected, to_change = pair[0], pair[1]
         cursor.execute(f"UPDATE {table} SET {detected} = ? WHERE {item} = ?", (to_change, value))
         conn.commit()
+
 
 def get(table, *args):
     detected = args[0]
@@ -81,6 +111,7 @@ def get(table, *args):
         return result[0]
     else:
         return -1
+
 
 def fetchall(table, columns):
     columns_joined = ', '.join(columns)
@@ -94,15 +125,18 @@ def fetchall(table, columns):
         result.append(dict_row)
     return result
 
+
 def delete_table(table):
     cursor.execute(f"DROP TABLE {table}")
     conn.commit()
+
 
 def delete(table, *args):
     item = args[0]
     value = args[1]
     cursor.execute(f"DELETE FROM {table} WHERE {item} = {value}")
     conn.commit()
+
 
 def check_db_exists():
     cursor.execute("SELECT name FROM sqlite_master "
