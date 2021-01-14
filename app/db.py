@@ -4,8 +4,9 @@ import threading
 
 import parsingSchedule
 
-conn = sqlite3.connect(os.path.join("db", "users_codes.db"), check_same_thread=False)
-
+# /home/kxcoze/py/projects/schedulebot-ncfu/app/db/users_codes.db
+# conn = sqlite3.connect(os.path.join("db", "users_codes.db"), check_same_thread=False)
+conn = sqlite3.connect("/home/kxcoze/py/projects/schedulebot-ncfu/app/db/users_codes.db", check_same_thread=False)
 cursor = conn.cursor()
 
 lock = threading.Lock()
@@ -34,11 +35,12 @@ def init_db():
     cursor.execute("""CREATE TABLE IF NOT EXISTS users(
         user_id TEXT PRIMARY KEY,
         group_code INT,
-        subgroup TEXT, 
+        subgroup TEXT,
         notifications INT,
-        schedule_cur_week TEXT,
-        schedule_next_week TEXT,
-        link TEXT);
+        schedule_cur_week JSON,
+        schedule_next_week JSON,
+        link TEXT,
+        preferences INT);
     """)
 
     cursor.execute("""CREATE TABLE IF NOT EXISTS univer_code(
@@ -48,7 +50,7 @@ def init_db():
         group_code INT,
         CONSTRAINT pk PRIMARY KEY (institute_name, speciality_name, group_name));
     """)
-        
+
     conn.commit()
 
 

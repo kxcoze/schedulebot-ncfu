@@ -2,6 +2,7 @@ import requests
 import pprint
 import json
 import csv
+from pprint import pprint
 from typing import List
 from datetime import datetime
 
@@ -40,7 +41,11 @@ class Parser:
                 ind += 1
             elif item is not None and ind != -1:
                 stats = item.find_all('td')
-                number = stats[0].find('span').text
+                number = ', '.join((
+                        stats[0].find('div').text.strip(),
+                        stats[0].find('div')['title'],
+                ))
+                print(number)
                 lessonName = stats[1].text
                 audName = stats[2].text.strip().replace('\n', '')
                 lessonType = stats[3].text
@@ -229,6 +234,9 @@ def get_formatted_schedule(user_id, range, requested_week='cur'):
                 '<b>'+day['weekday']+', '+day['date']+'</b>\n')
 
         for lesson in day['lessons']:
+            print(lesson['number'].split(', '))
+            numb_para, time_para = lesson['number'].split(', ')
+
             groupNumber = ''
             if flag and lesson['groupNumber'] != '':
                 groupNumber = lesson['groupNumber']+'-я подгруппа, '
@@ -250,14 +258,15 @@ def get_formatted_schedule(user_id, range, requested_week='cur'):
                 lessonType = ''
 
             formatted_schedule += ''.join(
-                    lesson['number'] + ' пара '
-                    + '<em>('+schedule_bell[lesson['number']]+')</em>\n'
+                    numb_para
+                    + ' <em>('+time_para+')</em>\n'
                     + lesson['lessonName']
                     + ', '+audName
                     + lessonType+', '
                     + groupNumber
                     + lesson['teacherName']+eod
             )
+
     return formatted_schedule
 
 
@@ -329,25 +338,15 @@ def _get_schedule_bell_ncfu():
 
 
 def main():
-    """
-    url = 'https://ecampus.ncfu.ru/schedule/group/14904'
-    parser = SelParser(url)
-    parser.get_schedule_html()
-    """
-            
-    print(get_every_aliases_days_week())
-    pass
+    # url = 'https://ecampus.ncfu.ru/schedule/group/14904'
+    # parser = SelParser(url)
+    # parser.get_schedule_html()
+    # pprint(get_json_schedule(14904), indent=6)
+    # print(get_every_aliases_days_week())
+    print(_get_schedule_bell_ncfu()['3'])
 
 
 if __name__ == '__main__':
-    # get_json_schedule(input())
+    #
     # get_formatted_schedule(input(), input())
-    weekdays = {-1: 'Неделя',
-                0: 'Понедельник',
-                1: 'Вторник',
-                2: 'Среда',
-                3: 'Четверг',
-                4: 'Пятница',
-                5: 'Суббота',
-                6: 'Воскресенье'}
     main()

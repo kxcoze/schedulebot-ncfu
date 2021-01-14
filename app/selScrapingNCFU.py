@@ -23,8 +23,8 @@ class SelScrapingSchedule:
 
     def check_connection(self):
         """Проверка наличия интернета"""
-        # Можно сделать лучше! 
-        # Данная функция проверяет наличие интернета, а не скорость соединения, 
+        # Можно сделать лучше!
+        # Данная функция проверяет наличие интернета, а не скорость соединения,
         # поэтому необходимо переделать в скором времени.
         try:
             subprocess.check_call(["ping", "-c 1", "www.google.com"])
@@ -36,7 +36,7 @@ class SelScrapingSchedule:
 
     def get_html_from_schedule(self):
         """Прокликиваем все доступные институты и специальности
-           ради получения ссылок на группы, возвращаем html-документ 
+           ради получения ссылок на группы, возвращаем html-документ
            страницы в переменную класса html"""
         try:
             url = 'https://ecampus.ncfu.ru/schedule'
@@ -49,9 +49,9 @@ class SelScrapingSchedule:
             return
         # XPATH = /div[@class='panel-collapse collapse in']/div[@class='panel-body']/div[@class='panel-group specialities']/div[@class='panel panel-default']
         XPATH_to_institutes = "//div[@id='page']/div[@id='select-group']/div[@class='col-lg-7 col-md-6']/div[@id='institutes']/div[@class='panel panel-default']"
-        
+
         XPATH_to_specialities = XPATH_to_institutes + "/div[@class='panel-collapse collapse in']/div[@class='panel-body']/div[@class='panel-group specialities']/div[@class='panel panel-default']"
-        
+
         # XPATH_to_groups = XPATH_to_specialities + "/div[@class='panel-collapse collapse in']/div[@class='panel-body']/ul[@class='list-group']/li[@class='list-group-item']"
         try:
             institutes = WebDriverWait(browser, 30).until(
