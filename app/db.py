@@ -11,6 +11,7 @@ cursor = conn.cursor()
 
 lock = threading.Lock()
 
+
 def lock_thread(main_thread=False):
     def decorator(func):
 
@@ -66,7 +67,7 @@ def insert_codes():
 
     data = parsingSchedule.get_codes()
     # [0] - Институт, [1] - Специальность, [2] - Группа, [3] - Код группы
-    data_to_insert = ['','','','']
+    data_to_insert = ['', '', '', '']
     for item in data:
         data_to_insert[0] = item['instituteName'].lower()
         for speciality in item['specialities']:
@@ -91,15 +92,15 @@ def insert(table, *args):
 
 
 def insert_new_user(user_id):
-    cursor.execute(f"INSERT INTO users VALUES({user_id}, -1, 0, 0, '', '', '[]')")
-    conn.commit()
+    insert('users', user_id, -1, 0, 0, '', '', '[]', 5)
 
 
 def update(table, data, item, value):
     # type(data)->Tuple -> List[0] - to_change, List[1] - value
     for pair in data:
         detected, to_change = pair[0], pair[1]
-        cursor.execute(f"UPDATE {table} SET {detected} = ? WHERE {item} = ?", (to_change, value))
+        cursor.execute(
+            f"UPDATE {table} SET {detected} = ? WHERE {item} = ?", (to_change, value))
         conn.commit()
 
 
@@ -107,7 +108,7 @@ def get(table, *args):
     detected = args[0]
     item = args[1]
     value = args[2]
-    cursor.execute(f"SELECT {detected} FROM {table} WHERE {item} = '{value}'")
+    cursor.execute(f"SELECT {detected} FROM {table} WHERE {item} = ?", (value, ))
     result = cursor.fetchone()
     if result:
         return result[0]
@@ -136,7 +137,7 @@ def delete_table(table):
 def delete(table, *args):
     item = args[0]
     value = args[1]
-    cursor.execute(f"DELETE FROM {table} WHERE {item} = {value}")
+    cursor.execute(f"DELETE FROM {table} WHERE {item} = ?", (value, ))
     conn.commit()
 
 

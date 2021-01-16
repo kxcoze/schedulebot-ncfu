@@ -1,12 +1,11 @@
-import time
 import threading
 import json
 import asyncio
 from pprint import pprint
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import schedule
-from aiogram import Bot, types
+from aiogram import Bot
 
 import db
 import scheduleCreator as SC
@@ -21,39 +20,35 @@ def update_schedules_users():
     for user in data:
         # print(user['user_id'], user['group_code'], user['subgroup'])
         try:
-            SC.update_schedule_user(user['user_id'], user['group_code'], user['subgroup'])
+            SC.update_schedule_user(
+                user['user_id'], user['group_code'], user['subgroup'])
         except:
             # print("FAILED")
-            continue
+            pass
         # print("SUCCESS")
 
 
 def prepare_receivers(cur_lesson):
-    cur_weekday, cur_time = datetime.today().weekday(), datetime.datetime.now().strftime('%H:%M').split(':')
+    cur_weekday = datetime.today().weekday()
     if cur_weekday == 6:
         return
 
-    weekdays = {0 : 'Понедельник',
-                1 : 'Вторник',
-                2 : 'Среда',
-                3 : 'Четверг',
-                4 : 'Пятница',
-                5 : 'Суббота',
-                6 : 'Воскресенье'}
+    weekdays = {
+        0: 'Понедельник',
+        1: 'Вторник',
+        2: 'Среда',
+        3: 'Четверг',
+        4: 'Пятница',
+        5: 'Суббота',
+    }
+    time_lesson_start = SC._get_schedule_bell_ncfu()[cur_lesson] \
+        .split(' - ')[0].split(':')
 
     cur_day = weekdays[cur_weekday]
+    now = datetime.now()
+    lesson_start = now.replace(hour=int(time_lesson_start[0]), minute=int(time_lesson_start[-1]))
 
-
-    time_lesson_start = SC._get_schedule_bell_ncfu()[cur_lesson].split(' - ')[0].split(':')
-    verification_time = (
-        int(time_lesson_start[0]) - int(cur_time[0]),
-        int(time_lesson_start[-1]) - int(cur_time[-1]),
-    )
-    if verification_time[0] >= 1:
-        verification_time = verification_time[0]
-    else:
-        verification_time = verification_time[-1]
-
+    verification_time = (lesson_start - now).seconds // 60
     data = db.fetchall('users', ('user_id', 'notifications', 'subgroup', 'preferences'))
     subscribers = []
     for user in data:
@@ -85,55 +80,82 @@ def prepare_receivers(cur_lesson):
         for day in copied_schedulejs:
             if day['weekday'] == cur_day:
                 for lesson in day['lessons']:
+                    if lesson['number'][0] == cur_lesson:
+                        start = ''
+                        if verification_time == 60:
+                            start = 'Через час'
+                        elif verification_time == 0:
+                            start = 'Сейчас'
+                        else:
+                            start = f'Через {verification_time} минут'
 
-                    if lesson['number'] == str(cur_lesson):
                         group_number = ''
                         if flag and lesson['groupNumber'] != '':
-                            group_number = ' у ' +lesson['groupNumber'] + '-й подгруппы, '
-                        message = ''.join("Сейчас начнется "+lesson['number']+
-                                          " пара - "+lesson['lessonName']+
-                                          ", "+lesson['lessonType']+
-                                          group_number+
-                                          " у "+lesson['teacherName']+
-                                          " в "+lesson['audName']+" ауд.")
-                        receivers.append({'user_id':sub['user_id'], 'message':message})
+                            group_number = f"Подгруппа: №{lesson['groupNumber']}\n"
+
+                        audName = ''
+                        if lesson['audName'] != 'ВКС' and lesson['audName'] != 'ЭТ':
+                            audName = f"Аудитория: {lesson['audName']}\n"
+
+                        links = json.loads(
+                            db.get('users', 'link', 'user_id', sub['user_id']))
+                        searched_link = ''
+                        for link in links:
+                            # Может реализовать по совпадениям?
+                            if link[0] == lesson['lessonName'] or link[0] == lesson['teacherName']:
+                                searched_link = f'\nСсылка на пару: {link[-1]}'
+                                break
+
+                        message = (
+                            f"{start} начнётся {lesson['number'][0]} пара:\n"
+                            f"{lesson['lessonName']}\n"
+                            f"{lesson['lessonType']}\n"
+                            f"{group_number}"
+                            f"Преподаватель: {lesson['teacherName']}\n"
+                            f"{audName}"
+                            f"{searched_link}"
+                        )
+                        receivers.append(
+                            {'user_id': sub['user_id'], 'message': message})
     return receivers
+
 
 def start_background_eventloop(loop):
     asyncio.set_event_loop(loop)
     loop.run_forever()
 
-async def send_message_to_users(cur_lesson=3):
+
+async def send_message_to_users(cur_lesson=1):
     receivers = prepare_receivers(cur_lesson)
     for user in receivers:
         await bot.send_message(user['user_id'], user['message'])
+
 
 async def run_continuous(interval=1):
     while True:
         schedule.run_pending()
         await asyncio.sleep(interval)
 
+
 def prepare_to_sending_notification(lesson_num):
-    task_send = asyncio.create_task(send_message_to_users(lesson_num))
+    asyncio.create_task(send_message_to_users(lesson_num))
+
 
 def schedule_for_tasks():
-
     # Присылать уведомления о начале пары
     bell_schedule = SC._get_schedule_bell_ncfu()
     for num, lesson in bell_schedule.items():
         if num.isdigit():
-            time_lesson = lesson.split()[0].split(':')
+            time_lesson_start = lesson.split()[0].split(':')
+            lesson_start = datetime.now().replace(
+                hour=int(time_lesson_start[0]),
+                minute=int(time_lesson_start[-1]),
+            )
             for appr_time in reversed(range(0, 61)):
+                appr_lesson_start = lesson_start - timedelta(minutes=appr_time)
+                schedule.every().day.at(appr_lesson_start.strftime("%H:%M")).do(
+                    prepare_to_sending_notification, num)
 
-                hour, minute = _sub_correctly(time_lesson, appr_time)
-
-                res = [str(hour), str(minute)]
-
-                for ind, time_iter in enumerate(res):
-                    if len(time_iter) <= 1:
-                        res[ind] = '0'*(2-len(time_iter))+time_iter
-                lesson_start = res[0]+':'+res[-1]
-                schedule.every().day.at(lesson_start).do(prepare_to_sending_notification, num)
     # Обновить расписание хранящиеся в БД
     schedule.every().sunday.at("00:00:00").do(update_schedules_users)
 
@@ -142,24 +164,16 @@ def schedule_for_tasks():
     pprint(schedule.jobs)
 
 
-def _sub_correctly(time_lesson, requested_subtraction):
-    requsted_time = int(time_lesson[-1]) - requested_subtraction
-    if requsted_time < 0:
-        hour, minute = int(time_lesson[0])-1, 60 - abs(requsted_time)
-    else:
-        hour, minute = int(time_lesson[0]), requsted_time
-    return hour, minute
-
-
 def _main():
     loop = asyncio.new_event_loop()
     schedule_for_tasks()
-    off_thread = threading.Thread(
+    threading.Thread(
             target=start_background_eventloop, args=(loop,),
             name='schedule_thread',
             daemon=True,
     ).start()
     asyncio.run_coroutine_threadsafe(run_continuous(), loop)
+
 
 if __name__ == '__main__':
     _main()

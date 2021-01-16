@@ -1,8 +1,6 @@
 import requests
-import pprint
 import json
 import csv
-from pprint import pprint
 from typing import List
 from datetime import datetime
 
@@ -158,6 +156,7 @@ def update_schedule_user(user_id, group_code, group_subnum):
                 schedule_weeks[0],
                 schedule_weeks[1],
                 '[]',
+                5,
         )
     except db.sqlite3.IntegrityError:
         db.update(
@@ -179,7 +178,8 @@ def get_formatted_schedule(user_id, range, requested_week='cur'):
     date_dict = {'today': today, 'tommorow': tom, 'week': -1}
     date_dict.update(_get_eng_days_week())
 
-    days_week = {-1: 'Неделя',
+    days_week = {
+                -1: 'Неделя',
                 0: 'Понедельник',
                 1: 'Вторник',
                 2: 'Среда',
@@ -227,14 +227,12 @@ def get_formatted_schedule(user_id, range, requested_week='cur'):
     elif flag:
         copied_schedulejs = schedulejs
 
-    schedule_bell = _get_schedule_bell_ncfu()
     formatted_schedule = f'<b><em>Расписание занятий на {weekday}</em></b>\n\n'
     for day in copied_schedulejs:
         formatted_schedule += ''.join(
                 '<b>'+day['weekday']+', '+day['date']+'</b>\n')
 
         for lesson in day['lessons']:
-            print(lesson['number'].split(', '))
             numb_para, time_para = lesson['number'].split(', ')
 
             groupNumber = ''
@@ -245,17 +243,15 @@ def get_formatted_schedule(user_id, range, requested_week='cur'):
             if lesson == day['lessons'][-1]:
                 eod = '\n\n\n'
 
-            audName = lesson['audName'].replace('-', '')
+            audName = lesson['audName']
 
             lessonType = ', '
-            if len((lesson['lessonType'].split())) > 1:
+            if len(lesson['lessonType'].split()) > 1:
                 lessonT = lesson['lessonType'].split()
                 for i in lessonT:
                     lessonType += i[0].upper()
-            elif audName != 'ВКС':
-                lessonType += lesson['lessonType'].strip()
             else:
-                lessonType = ''
+                lessonType += lesson['lessonType'].strip()
 
             formatted_schedule += ''.join(
                     numb_para

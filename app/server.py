@@ -1,4 +1,3 @@
-import os
 import logging
 import re
 import asyncio
@@ -40,6 +39,7 @@ list = CallbackData(
 
 class MainStates(StatesGroup):
     waiting_for_group_name = State()
+    adding_preferences = State()
 
 
 class AddStates(StatesGroup):
@@ -77,7 +77,8 @@ async def send_help_commands(message: types.Message, state: FSMContext):
 @dp.message_handler(commands=['setgroup'], state=None)
 async def set_user_group(message: types.Message):
     await message.reply(
-            "Введите название группы (в любом регистре) и укажите номер подгруппы (можно оставить пустым), например:\n"
+            "Введите название группы (в любом регистре) и укажите "
+            "номер подгруппы (можно оставить пустым), например:\n"
             "ЭКП-б-о-19-1 \n"
             "КГИ-б-о-18-1(1) \n"
             "тбо-б-о-19-1 2 \n")
@@ -105,7 +106,6 @@ async def wait_for_group_name(message: types.Message, state: FSMContext):
     except:
         group_subnum = 0
 
-
     group_code = db.get('univer_code', 'group_code', 'group_name', group_name)
 
     # Возможно есть реализация получше! Может быть перенести в другой скрипт?
@@ -117,10 +117,11 @@ async def wait_for_group_name(message: types.Message, state: FSMContext):
             # Успешно
             pass
         finally:
-            await bot.edit_message_text(chat_id=message.chat.id,
-                                        message_id=answer_success.message_id,
-                                        text="Расписание на неделю загружено!\n"
-                                             "Вы можете просмотреть его используя команду /week")
+            await bot.edit_message_text(
+                chat_id=message.chat.id,
+                message_id=answer_success.message_id,
+                text="Расписание на неделю загружено!\n"
+                     "Вы можете просмотреть его используя команду /week")
             await state.finish()
     else:
         await message.reply("Введенная группа не существует, попробуйте снова")
@@ -147,13 +148,49 @@ async def show_user_schedule_cur_week(message: types.Message, regexp_command=Non
         schedule = SC.get_formatted_schedule(message.chat.id, command, week)
         await message.answer(schedule, parse_mode='HTML')
     else:
-        await message.reply("Похоже что Вы не выбрали группу перед тем как посмотреть расписание, пожалуйста, воспользуйтесь командой /setgroup и укажите Вашу группу")
+        await message.reply(
+            "Похоже что Вы не выбрали группу перед тем как"
+            " посмотреть расписание, пожалуйста, воспользуйтесь"
+            " командой /setgroup и укажите Вашу группу")
 
 
 @dp.message_handler(commands=['notifyme'])
 async def set_user_notification(message: types.Message):
     db.update('users', (('notifications', 1), ), 'user_id', message.chat.id)
-    await message.reply("Вы успешно подписались на уведомления о начале пары!")
+    try:
+        pref_time = db.get(
+            'users', 'preferences', 'user_id', message.chat.id)
+    except Exception as e:
+        print(e)
+    await message.reply(
+        "Вы успешно подписались на уведомления о начале пары!\n\n"
+        f"Время за которое Вас уведомлять о начале пары: {pref_time} минут\n"
+        "Желаете ли определить время за которое Вас оповещать?\n"
+        "Если да, нажмите/введите /setpreferences"
+    )
+
+
+@dp.message_handler(commands=['setpreferences'])
+async def wait_user_preferences(message: types.Message):
+    await message.answer(
+        "Для установки времени уведомления начала пары, "
+        "напишите число от 0 до 60\n"
+    )
+    await MainStates.adding_preferences.set()
+
+
+@dp.message_handler(state=MainStates.adding_preferences)
+async def set_user_preferences(message: types.Message, state: FSMContext):
+    if message.text.isdigit() and 0 <= int(message.text) <= 60:
+        db.update(
+            'users',
+            (('preferences', message.text), ),
+            'user_id', message.chat.id
+        )
+        await message.answer("Время успешно установлено!")
+        await state.finish()
+    else:
+        await message.answer("Вы ввели не подходящее число!")
 
 
 @dp.message_handler(commands=['stopnotifyme'])
@@ -469,15 +506,18 @@ async def query_add_link(query: types.CallbackQuery,
               "или\n"
               "<b>Иванов Иван Иванович\n"
               "'Cсылка на занятие'</b>")
-    await AddStates.input_link.set()
+
     async with state.proxy() as data:
         data['main'] = query.message.message_id
         data['page_num'] = int(callback_data['page_num'])
+
     await bot.send_message(
             text=answer,
             chat_id=query.from_user.id,
             parse_mode='HTML',
     )
+
+    await AddStates.input_link.set()
 
 
 @dp.message_handler(state=AddStates.input_link)
