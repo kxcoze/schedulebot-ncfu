@@ -1,7 +1,138 @@
 import json
 from typing import List, Tuple
 
+from aiogram import types
+from aiogram.utils.callback_data import CallbackData
+
 import db
+
+WIDTH = 5
+
+list = CallbackData(
+        'page',
+        'id',
+        'page_num',
+        'action',
+)  # page:<id>:<page_num>:<action>
+
+
+def search_nonempty_page(links, left, right, cur_page):
+    page = cur_page
+    while page > 0 and len(links[left:right]) == 0:
+        right -= WIDTH
+        left -= WIDTH
+        page -= 1
+
+    return left, right, page
+
+
+def show_page(user_id, cur_page=0):
+    links = get_links(user_id)
+    left = cur_page * WIDTH
+    right = cur_page*WIDTH + WIDTH
+
+    if len(links[left:right]) == 0:
+        left, right, cur_page = search_nonempty_page(links,
+                                                     left, right, cur_page)
+
+    add_prev = False
+    add_next = False
+
+    links_size = len(links)
+    if cur_page > 0:
+        add_prev = True
+
+    if right < links_size:
+        add_next = True
+
+    if links_size == 0:
+        text = ('Список ваших ссылок пуст.\n'
+                'Нажмите кнопку <b>Добавить ссылку</b> '
+                'для добавления очередной ссылки \n'
+                'Заметьте поддерживается не более 15 ссылок \n'
+                'Если предмет/преподаватель указаны корректно, то '
+                'при оповещении о начале пары '
+                'cсылка добавится автоматически.')
+    else:
+        text = '<b><em>Ваши ссылки</em></b>\n'
+    markup = types.InlineKeyboardMarkup()
+    menu = []
+    if add_prev:
+        menu.append(types.InlineKeyboardButton(
+                '«',
+                callback_data=list.new(
+                    id='-', page_num=cur_page-1, action='prev'))
+                    )
+    for ind, link in enumerate(links[left:right], start=left+1):
+        text += (f"№{ind}\n"
+                 f"Предмет/Преподаватель: {link[0]}\n"
+                 f"Ссылка на пару: {link[1]}\n\n")
+
+        menu.append(types.InlineKeyboardButton(
+                ind,
+                callback_data=list.new(
+                    id=ind, page_num=cur_page, action='view'))
+                    )
+    if add_next:
+        menu.append(types.InlineKeyboardButton(
+                '»',
+                callback_data=list.new(
+                    id='-', page_num=cur_page+1, action='next'))
+                    )
+
+    markup.row(*menu)
+
+    markup.add(
+        types.InlineKeyboardButton(
+            'Добавить ссылку',
+            callback_data=list.new(
+                id='-', page_num=cur_page, action='add')),
+    )
+    return text, markup
+
+
+def view_link_data(user_id, cur_page, ind):
+    markup = types.InlineKeyboardMarkup()
+
+    links = get_links(user_id)
+    text = ''.join(f"№{ind+1}\n"
+                   f"Предмет/Преподаватель: {links[ind][0]}\n"
+                   f"Ссылка на пару: {links[ind][1]}\n")
+    markup.row(
+        types.InlineKeyboardButton(
+            'Изменить предмет/препод.',
+            callback_data=list.new(
+                id="1", page_num=cur_page, action='edit')),
+
+        types.InlineKeyboardButton(
+            'Изменить ссылку',
+            callback_data=list.new(
+                id="2", page_num=cur_page, action='edit')),
+    )
+    markup.row(
+        types.InlineKeyboardButton(
+            'Удалить ссылку',
+            callback_data=list.new(
+                id=ind, page_num=cur_page, action='delete_link')),
+
+        types.InlineKeyboardButton(
+            '« Вернуться назад',
+            callback_data=list.new(
+                id='-', page_num=cur_page, action='main')),
+    )
+    return text, markup
+
+
+def back_to_main(cur_page):
+    markup = types.InlineKeyboardMarkup()
+
+    markup.add(
+        types.InlineKeyboardButton(
+            '« Вернуться назад',
+            callback_data=list.new(
+                id='-', page_num=cur_page, action='main')),
+    )
+    return markup
 
 
 def get_links(user_id: str) -> List:
@@ -74,4 +205,4 @@ def delete_link_by_info(user_id: str, link_to_delete: Tuple, ind: int) -> int:
 
 def _update_db_link(user_id: str, user_link: List) -> None:
     user_link = json.dumps(user_link, ensure_ascii=False)
-    db.update('users', [['link', user_link]], 'user_id', user_id)
+    db.update('users', (('link', user_link), ), 'user_id', user_id)

@@ -1,4 +1,4 @@
-import os
+import json
 import sqlite3
 import threading
 
@@ -40,8 +40,8 @@ def init_db():
         notifications INT,
         schedule_cur_week JSON,
         schedule_next_week JSON,
-        link TEXT,
-        preferences INT);
+        link JSON,
+        preferences JSON);
     """)
 
     cursor.execute("""CREATE TABLE IF NOT EXISTS univer_code(
@@ -91,8 +91,20 @@ def insert(table, *args):
     conn.commit()
 
 
-def insert_new_user(user_id):
-    insert('users', user_id, -1, 0, 0, '', '', '[]', 5)
+def insert_new_user(
+    user_id, group_code=-1, group_subnum=0,
+        notifications=0,
+        schedule_cur_week='', schedule_next_week='',
+        links='[]',
+        references={'pref_time': 5, 'notification_type': 'distant'}):
+    insert(
+        'users',
+        user_id, group_code, group_subnum,
+        notifications,
+        schedule_cur_week, schedule_next_week,
+        links,
+        json.dumps(references, ensure_ascii=False),
+    )
 
 
 def update(table, data, item, value):

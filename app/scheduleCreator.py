@@ -1,11 +1,13 @@
 import requests
 import json
 import csv
+import time
 from typing import List
 from datetime import datetime
 
 from bs4 import BeautifulSoup as BS4
 from selenium import webdriver
+
 
 import db
 
@@ -43,7 +45,6 @@ class Parser:
                         stats[0].find('div').text.strip(),
                         stats[0].find('div')['title'],
                 ))
-                print(number)
                 lessonName = stats[1].text
                 audName = stats[2].text.strip().replace('\n', '')
                 lessonType = stats[3].text
@@ -89,6 +90,7 @@ class SelParser:
             if 'selected' in element.get_attribute('class'):
                 index_to_click = index + 1
                 break
+        time.sleep(1)
         elements[index_to_click].click()
         next_week_html = browser.page_source
         browser.quit()
@@ -139,7 +141,7 @@ def get_two_weeks_schedule(code_group):
     data = ['', '']
     for ind, week in enumerate(weeks_html):
         data[ind] = json.dumps(parser.get_schedule(week), ensure_ascii=False)
-
+    # pprint.pprint(data)
     return data[0], data[1]
 
 
@@ -147,16 +149,12 @@ def get_two_weeks_schedule(code_group):
 def update_schedule_user(user_id, group_code, group_subnum):
     schedule_weeks = get_two_weeks_schedule(group_code)
     try:
-        db.insert(
-                'users',
+        db.insert_new_user(
                 user_id,
-                group_code,
-                group_subnum,
-                0,
-                schedule_weeks[0],
-                schedule_weeks[1],
-                '[]',
-                5,
+                group_code=group_code,
+                group_subnum=group_subnum,
+                schedule_cur_week=schedule_weeks[0],
+                schedule_next_week=schedule_weeks[1],
         )
     except db.sqlite3.IntegrityError:
         db.update(

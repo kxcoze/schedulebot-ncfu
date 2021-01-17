@@ -2,23 +2,23 @@ import logging
 import re
 import asyncio
 import typing
+import json
 from concurrent.futures import ThreadPoolExecutor
 
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext, filters
-from aiogram.utils.callback_data import CallbackData
 from aiogram.utils.exceptions import MessageNotModified
 
 import db
 import scheduleCreator as SC
 import schedulerForTasks as tasks
 import linkmanager as lm
-
+import inlinekeyboard as ik
 
 API_TOKEN = '1458781343:AAEN9-LvDZeOKa3fn738zgDpqVssqFIJ-Ok'
-WIDTH = 5
+
 main_commands_viewing_schedule, optional_commands_viewing_schedule = SC.get_every_aliases_days_week()
 
 ex = ThreadPoolExecutor(max_workers=1)
@@ -29,17 +29,10 @@ bot = Bot(token=API_TOKEN)
 # Возможно стоит изменить storage
 dp = Dispatcher(bot, storage=MemoryStorage())
 
-list = CallbackData(
-        'page',
-        'id',
-        'page_num',
-        'action',
-)  # page:<id>:<page_num>:<action>
-
 
 class MainStates(StatesGroup):
     waiting_for_group_name = State()
-    adding_preferences = State()
+    add_time_preference = State()
 
 
 class AddStates(StatesGroup):
@@ -55,7 +48,7 @@ async def initializebot(message: types.Message):
     await message.answer(
             "Привет! \n"
             "Я бот для расписаний СКФУ! \n"
-            "Для команд просмотра всех команд наберите /help \n"
+            "Для просмотра всех команд наберите /help \n"
             "<em>Powered by aiogram.</em>", parse_mode='HTML')
 
 
@@ -69,6 +62,7 @@ async def send_help_commands(message: types.Message, state: FSMContext):
             "/today - Посмотреть расписание на сегодня \n"
             "/tommorow или /tom - Посмотреть расписание на завтра \n"
             "/week - Посмотреть расписание на неделю \n"
+            "/links - Интерфейс для работы со ссылками \n"
             "/bell - Посмотреть расписание звонков \n"
             "/notifyme - Подписаться на уведомления о начале пары \n"
             "/stopnotifyme - Отписаться от уведомлений ")
@@ -103,19 +97,17 @@ async def wait_for_group_name(message: types.Message, state: FSMContext):
     try:
         # Поиск подгруппы в сообщении пользователя
         group_subnum = resubgroup.search(message.text).groups()[0]
-    except:
+    except AttributeError:
         group_subnum = 0
 
     group_code = db.get('univer_code', 'group_code', 'group_name', group_name)
-
     # Возможно есть реализация получше! Может быть перенести в другой скрипт?
     if not group_code == -1:
         answer_success = await message.answer("Группа найдена, пробуем загрузить Ваше расписание...")
         try:
             await asyncio.get_running_loop().run_in_executor(ex, SC.update_schedule_user, message.chat.id, group_code, group_subnum)
-        except:
-            # Успешно
-            pass
+        except Exception as e:
+            print(e)
         finally:
             await bot.edit_message_text(
                 chat_id=message.chat.id,
@@ -156,10 +148,11 @@ async def show_user_schedule_cur_week(message: types.Message, regexp_command=Non
 
 @dp.message_handler(commands=['notifyme'])
 async def set_user_notification(message: types.Message):
+    # Добавить обработку отсутствия пользователя в БД
     db.update('users', (('notifications', 1), ), 'user_id', message.chat.id)
     try:
-        pref_time = db.get(
-            'users', 'preferences', 'user_id', message.chat.id)
+        pref_time = json.loads(db.get(
+            'users', 'preferences', 'user_id', message.chat.id))['pref_time']
     except Exception as e:
         print(e)
     await message.reply(
@@ -171,20 +164,55 @@ async def set_user_notification(message: types.Message):
 
 
 @dp.message_handler(commands=['setpreferences'])
-async def wait_user_preferences(message: types.Message):
+async def command_set_user_preferences(message: types.Message, state: FSMContext):
+    await state.finish()
+    text, markup = ik.show_optional_ikeyboard()
     await message.answer(
+        text,
+        reply_markup=markup,
+        parse_mode='HTML',
+    )
+
+
+@dp.callback_query_handler(ik.cbd_poll.filter(id='0'), state='*')
+async def query_set_user_preferences(query: types.CallbackQuery, state: FSMContext):
+    await state.finish()
+    text, markup = ik.show_optional_ikeyboard()
+    await bot.edit_message_text(
+        text=text,
+        chat_id=query.from_user.id,
+        message_id=query.message.message_id,
+        reply_markup=markup,
+        parse_mode='HTML',
+    )
+
+
+@dp.callback_query_handler(ik.cbd_poll.filter(id='1'), state='*')
+async def wait_user_time_preferences(query: types.CallbackQuery, state: FSMContext):
+    await query.answer()
+    answer = (
         "Для установки времени уведомления начала пары, "
         "напишите число от 0 до 60\n"
     )
-    await MainStates.adding_preferences.set()
+    await bot.send_message(
+                text=answer,
+                chat_id=query.from_user.id,
+                parse_mode='HTML',
+    )
+
+    await MainStates.add_time_preference.set()
 
 
-@dp.message_handler(state=MainStates.adding_preferences)
-async def set_user_preferences(message: types.Message, state: FSMContext):
+@dp.message_handler(state=MainStates.add_time_preference)
+async def set_user_time_preferences(message: types.Message, state: FSMContext):
     if message.text.isdigit() and 0 <= int(message.text) <= 60:
+        # Добавить обработку отсутствия пользователя в БД
+        preferences = json.loads(
+            db.get('users', 'preferences', 'user_id', message.chat.id))
+        preferences['pref_time'] = message.text
         db.update(
             'users',
-            (('preferences', message.text), ),
+            (('preferences', json.dumps(preferences, ensure_ascii=False)), ),
             'user_id', message.chat.id
         )
         await message.answer("Время успешно установлено!")
@@ -193,8 +221,37 @@ async def set_user_preferences(message: types.Message, state: FSMContext):
         await message.answer("Вы ввели не подходящее число!")
 
 
+@dp.callback_query_handler(ik.cbd_poll.filter(id='2'), state='*')
+async def wait_user_type_preferences(query: types.CallbackQuery):
+    await query.answer()
+    text, markup = ik.show_type_preference_ikeyboard()
+    await bot.edit_message_text(
+            text=text,
+            chat_id=query.from_user.id,
+            message_id=query.message.message_id,
+            reply_markup=markup,
+            parse_mode='HTML',
+    )
+    # await MainStates.add_time_preference.set()
+
+
+@dp.callback_query_handler(ik.cbd_choice.filter(action='choose'), state='*')
+async def set_user_type_preferences(query: types.CallbackQuery, callback_data: typing.Dict[str, str]):
+    await query.answer()
+    # Добавить обработку отсутствия пользователя в БД
+    preferences = json.loads(
+        db.get('users', 'preferences', 'user_id', query.from_user.id))
+    preferences['notification_type'] = callback_data['result']
+    db.update(
+        'users',
+        (('preferences', json.dumps(preferences, ensure_ascii=False)), ),
+        'user_id', query.from_user.id
+    )
+
+
 @dp.message_handler(commands=['stopnotifyme'])
 async def stop_user_notification(message: types.Message):
+    # Добавить обработку отсутствия пользователя в БД
     db.update('users', (('notifications', 0), ), 'user_id', message.chat.id)
     await message.reply("Вы отписались от уведомлений о начале пары!")
 
@@ -204,149 +261,31 @@ async def print_commands(message: types.Message):
     await message.answer(SC.get_formatted_schedule_bell(), parse_mode='HTML')
 
 
-def search_nonempty_page(links, left, right, cur_page):
-    page = cur_page
-    while page > 0 and len(links[left:right]) == 0:
-        right -= WIDTH
-        left -= WIDTH
-        page -= 1
-
-    return left, right, page
-
-
-def show_page(user_id, cur_page=0):
-    links = lm.get_links(user_id)
-    left = cur_page * WIDTH
-    right = cur_page*WIDTH + WIDTH
-
-    if len(links[left:right]) == 0:
-        left, right, cur_page = search_nonempty_page(links,
-                                                     left, right, cur_page)
-
-    add_prev = False
-    add_next = False
-
-    links_size = len(links)
-    if cur_page > 0:
-        add_prev = True
-
-    if right < links_size:
-        add_next = True
-
-    if links_size == 0:
-        text = ('Список ваших ссылок пуст.\n'
-                'Нажмите кнопку <b>Добавить ссылку</b> '
-                'для добавления очередной ссылки \n'
-                'Заметьте поддерживается не более 15 ссылок \n'
-                'Если предмет/преподаватель указаны корректно, то '
-                'при оповещении о начале пары '
-                'cсылка добавится автоматически.')
-    else:
-        text = '<b><em>Ваши ссылки</em></b>\n'
-    markup = types.InlineKeyboardMarkup()
-    menu = []
-    if add_prev:
-        menu.append(types.InlineKeyboardButton(
-                '«',
-                callback_data=list.new(
-                    id='-', page_num=cur_page-1, action='prev'))
-                    )
-    for ind, link in enumerate(links[left:right], start=left+1):
-        text += (f"№{ind}\n"
-                 f"Предмет/Преподаватель: {link[0]}\n"
-                 f"Ссылка на пару: {link[1]}\n\n")
-
-        menu.append(types.InlineKeyboardButton(
-                ind,
-                callback_data=list.new(
-                    id=ind, page_num=cur_page, action='view'))
-                    )
-    if add_next:
-        menu.append(types.InlineKeyboardButton(
-                '»',
-                callback_data=list.new(
-                    id='-', page_num=cur_page+1, action='next'))
-                    )
-
-    markup.row(*menu)
-
-    markup.add(
-            types.InlineKeyboardButton(
-                'Добавить ссылку',
-                callback_data=list.new(
-                    id='-', page_num=cur_page, action='add')),
-    )
-    return text, markup
-
-
-def view_link_data(user_id, cur_page, ind):
-    markup = types.InlineKeyboardMarkup()
-
-    links = lm.get_links(user_id)
-    text = ''.join(f"№{ind+1}\n"
-                   f"Предмет/Преподаватель: {links[ind][0]}\n"
-                   f"Ссылка на пару: {links[ind][1]}\n")
-    markup.row(
-            types.InlineKeyboardButton(
-                'Изменить предмет/препод.',
-                callback_data=list.new(
-                    id="1", page_num=cur_page, action='edit')),
-
-            types.InlineKeyboardButton(
-                'Изменить ссылку',
-                callback_data=list.new(
-                    id="2", page_num=cur_page, action='edit')),
-    )
-    markup.row(
-            types.InlineKeyboardButton(
-                'Удалить ссылку',
-                callback_data=list.new(
-                    id=ind, page_num=cur_page, action='delete_link')),
-
-            types.InlineKeyboardButton(
-                '« Вернуться назад',
-                callback_data=list.new(
-                    id='-', page_num=cur_page, action='main')),
-    )
-    return text, markup
-
-
-def back_to_main(cur_page):
-    markup = types.InlineKeyboardMarkup()
-
-    markup.add(
-            types.InlineKeyboardButton(
-                '« Вернуться назад',
-                callback_data=list.new(
-                    id='-', page_num=cur_page, action='main')),
-    )
-    return markup
-
-
 @dp.message_handler(commands=['links'], state='*')
 async def cmd_start(message: types.Message, state: FSMContext):
     await state.finish()
     try:
-        text, markup = show_page(message.chat.id)
+        text, markup = lm.show_page(message.chat.id)
+    except TypeError:
+        # Если пользователь пытается работать со ссылками
+        # но его нет в БД
+        db.insert_new_user(message.chat.id)
+        text, markup = lm.show_page(message.chat.id)
+    finally:
         await message.answer(
                 text=text,
                 reply_markup=markup,
                 parse_mode='HTML',
         )
-    except TypeError:
-        # Если пользователь пытается работать со ссылками
-        # но его нет в БД
-        db.insert_new_user(message.chat.id)
-        await cmd_start(message, state)
 
 
-@dp.callback_query_handler(list.filter(action=['main', 'prev', 'next']),
+@dp.callback_query_handler(lm.list.filter(action=['main', 'prev', 'next']),
                            state='*')
 async def query_show_prev_next_page(query: types.CallbackQuery,
                                     callback_data: typing.Dict[str, str]):
     await query.answer()
     cur_page = int(callback_data['page_num'])
-    text, markup = show_page(query.from_user.id, cur_page)
+    text, markup = lm.show_page(query.from_user.id, cur_page)
     await query.message.edit_text(
             text=text,
             reply_markup=markup,
@@ -354,7 +293,7 @@ async def query_show_prev_next_page(query: types.CallbackQuery,
     )
 
 
-@dp.callback_query_handler(list.filter(action='view'), state='*')
+@dp.callback_query_handler(lm.list.filter(action='view'), state='*')
 async def query_show_link_info(query: types.CallbackQuery,
                                callback_data: typing.Dict[str, str]):
     cur_page = int(callback_data['page_num'])
@@ -363,12 +302,12 @@ async def query_show_link_info(query: types.CallbackQuery,
     regex = ".(.?)\n\\D+: (.*)\n\\D+: (.*)"
     message_text = query.message.text
     data = re.findall(regex, message_text)
-    link = data[ind % WIDTH][1:]
+    link = data[ind % lm.WIDTH][1:]
 
     new_ind = lm.check_existing_link(query.from_user.id, link, ind)
     if new_ind == -1:
         await query.answer('Такого номера не существует!')
-        text, markup = show_page(query.from_user.id, cur_page)
+        text, markup = lm.show_page(query.from_user.id, cur_page)
         await query.message.edit_text(
             text=text,
             reply_markup=markup,
@@ -376,17 +315,17 @@ async def query_show_link_info(query: types.CallbackQuery,
         return
     elif new_ind != ind:
         ind = new_ind
-        cur_page = ind // WIDTH
+        cur_page = ind // lm.WIDTH
 
     try:
         await query.answer()
-        text, markup = view_link_data(query.from_user.id, cur_page, ind)
+        text, markup = lm.view_link_data(query.from_user.id, cur_page, ind)
         await query.message.edit_text(text, reply_markup=markup)
     except:
         await query.answer('Произошла непредвиденная ошибка.')
 
 
-@dp.callback_query_handler(list.filter(action=['edit']), state='*')
+@dp.callback_query_handler(lm.list.filter(action=['edit']), state='*')
 async def query_edit_info(query: types.CallbackQuery,
                           callback_data: typing.Dict[str, str],
                           state: FSMContext):
@@ -401,7 +340,7 @@ async def query_edit_info(query: types.CallbackQuery,
     if ind == -1:
         await query.answer("Вы пытаетесь изменить несуществующую"
                            "/измененную ссылку!")
-        text, markup = show_page(query.from_user.id, cur_page)
+        text, markup = lm.show_page(query.from_user.id, cur_page)
         await query.message.edit_text(
                 text=text,
                 reply_markup=markup,
@@ -446,7 +385,7 @@ async def state_edit_link(message: types.Message, state: FSMContext):
         elif variant == '2':
             lm.update_link_url(message.chat.id, ind, message_text)
 
-        text, markup = view_link_data(message.chat.id, cur_page, ind)
+        text, markup = lm.view_link_data(message.chat.id, cur_page, ind)
         try:
             await bot.edit_message_text(
                     text=text,
@@ -461,7 +400,7 @@ async def state_edit_link(message: types.Message, state: FSMContext):
         await state.finish()
 
 
-@dp.callback_query_handler(list.filter(action='delete_link'), state='*')
+@dp.callback_query_handler(lm.list.filter(action='delete_link'), state='*')
 async def query_delete_link(query: types.CallbackQuery,
                             callback_data: typing.Dict[str, str],
                             state: FSMContext):
@@ -481,7 +420,7 @@ async def query_delete_link(query: types.CallbackQuery,
         await query.answer('Произошла непредвиденная ошибка.')
 
     cur_page = int(callback_data['page_num'])
-    text, markup = show_page(query.from_user.id, cur_page)
+    text, markup = lm.show_page(query.from_user.id, cur_page)
     await query.message.edit_text(
             text=text,
             reply_markup=markup,
@@ -490,7 +429,7 @@ async def query_delete_link(query: types.CallbackQuery,
 
 
 # Возможно стоит добавить ограничитель нажатий
-@dp.callback_query_handler(list.filter(action='add'))
+@dp.callback_query_handler(lm.list.filter(action='add'))
 async def query_add_link(query: types.CallbackQuery,
                          callback_data: typing.Dict[str, str],
                          state: FSMContext):
@@ -541,14 +480,14 @@ async def process_link(message: types.Message, state: FSMContext):
         cur_page = data['page_num']
         result = lm.append_link(message.chat.id,
                                 *searched_data,
-                                cur_page*WIDTH)
+                                cur_page*lm.WIDTH)
         if result == 0:
             await bot.send_message(
                     text='Ссылка успешно добавлена!',
                     chat_id=message.chat.id,
-                    reply_markup=back_to_main(cur_page),
+                    reply_markup=lm.back_to_main(cur_page),
             )
-            text, markup = show_page(message.chat.id, cur_page)
+            text, markup = lm.show_page(message.chat.id, cur_page)
             try:
                 await bot.edit_message_text(
                         text=text,
@@ -577,7 +516,7 @@ async def process_link(message: types.Message, state: FSMContext):
             )
 
 
-@dp.callback_query_handler(list.filter(action='del'))
+@dp.callback_query_handler(lm.list.filter(action='del'))
 async def query_delete_link_by_num(
         query: types.CallbackQuery,
         callback_data: typing.Dict[str, str],
@@ -608,7 +547,7 @@ async def query_delete_link_by_num(
 
 def main():
     """
-    Фоновый поток для отслеживания сторонних задач, таких как:
+    Фоновый поток для выполнения сторонних задач, таких как:
     1) обновление кодов универа в БД,
     2) обновление текущего расписания в БД для всех пользователей,
     3) отправка уведомлений о начале пары.
