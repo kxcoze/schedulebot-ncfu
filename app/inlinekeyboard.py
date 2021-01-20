@@ -28,7 +28,6 @@ cbd_choice = CallbackData('choice', 'action', 'result')
 class MainStates(StatesGroup):
     waiting_for_group_name = State()
     add_time_preference = State()
-    add_type_preference = State()
 
 
 def show_optional_ikeyboard():
@@ -87,6 +86,7 @@ def show_type_preference_ikeyboard():
 
 @dp.message_handler(commands=['notifyme'])
 async def set_user_notification(message: types.Message):
+    # Добавить обработку отсутствия пользователя в БД
     db.update('users', (('notifications', 1), ), 'user_id', message.chat.id)
     try:
         pref_time = json.loads(db.get(
@@ -144,6 +144,7 @@ async def wait_user_time_preferences(query: types.CallbackQuery, state: FSMConte
 @dp.message_handler(state=MainStates.add_time_preference)
 async def set_user_time_preferences(message: types.Message, state: FSMContext):
     if message.text.isdigit() and 0 <= int(message.text) <= 60:
+        # Добавить обработку отсутствия пользователя в БД
         preferences = json.loads(
             db.get('users', 'preferences', 'user_id', message.chat.id))
         preferences['pref_time'] = message.text
@@ -174,7 +175,8 @@ async def wait_user_type_preferences(query: types.CallbackQuery):
 
 @dp.callback_query_handler(cbd_choice.filter(action='choose'), state='*')
 async def set_user_type_preferences(query: types.CallbackQuery, callback_data: typing.Dict[str, str]):
-    await query.answer()
+    await query.answer('Успешно!')
+    # Добавить обработку отсутствия пользователя в БД
     preferences = json.loads(
         db.get('users', 'preferences', 'user_id', query.from_user.id))
     preferences['notification_type'] = callback_data['result']

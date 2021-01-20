@@ -18,13 +18,11 @@ bot = Bot(token=API_TOKEN)
 def update_schedules_users():
     data = db.fetchall('users', ('user_id', 'group_code', 'subgroup'))
     for user in data:
-        # print(user['user_id'], user['group_code'], user['subgroup'])
         try:
             SC.update_schedule_user(
                 user['user_id'], user['group_code'], user['subgroup'])
-        except:
-            # print("FAILED")
-            pass
+        except Exception as e:
+            print(e)
         # print("SUCCESS")
 
 
@@ -41,82 +39,91 @@ def prepare_receivers(cur_lesson):
         4: 'Пятница',
         5: 'Суббота',
     }
+
     time_lesson_start = SC._get_schedule_bell_ncfu()[cur_lesson] \
         .split(' - ')[0].split(':')
 
     cur_day = weekdays[cur_weekday]
     now = datetime.now()
-    lesson_start = now.replace(hour=int(time_lesson_start[0]), minute=int(time_lesson_start[-1]))
+    lesson_start = now.replace(
+        hour=int(time_lesson_start[0]), minute=int(time_lesson_start[-1]))
 
     verification_time = (lesson_start - now).seconds // 60
-    data = db.fetchall('users', ('user_id', 'notifications', 'subgroup', 'preferences'))
+    data = db.fetchall(
+        'users', ('user_id', 'notifications', 'subgroup', 'preferences'))
+
     subscribers = []
     for user in data:
-        if user['notifications'] == 1 and user['preferences'] == verification_time:
+        pref_time = int(json.loads(user['preferences'])['pref_time'])
+        if user['notifications'] == 1 and pref_time == verification_time:
             subscribers.append(user)
 
     receivers = []
     for sub in subscribers:
-        schedulejs = json.loads(db.get('users', 'schedule_cur_week', 'user_id', sub['user_id']))
-        flag = True
-        copied_schedulejs = []
-        for ind, day in enumerate(schedulejs):
-            copied_schedulejs.append({'weekday': day['weekday'],
-                                      'date': day['date'],
-                                      'lessons': []})
-            for lesson in day['lessons']:
-                for group_number in lesson['groupNumber'].split(', '):
-                    if group_number == sub['subgroup']:
-                        flag = False
-                        copied_schedulejs[ind]['lessons'].append(lesson)
-                    elif group_number == '':
-                        copied_schedulejs[ind]['lessons'].append(lesson)
+        schedulejs = json.loads(
+            db.get('users', 'schedule_cur_week', 'user_id', sub['user_id']))
 
-        if not len(copied_schedulejs) > 0:
-            continue
-        elif flag:
-            copied_schedulejs = schedulejs
-
-        for day in copied_schedulejs:
+        searched_lesson = ''
+        for day in schedulejs:
             if day['weekday'] == cur_day:
                 for lesson in day['lessons']:
                     if lesson['number'][0] == cur_lesson:
-                        start = ''
-                        if verification_time == 60:
-                            start = 'Через час'
-                        elif verification_time == 0:
-                            start = 'Сейчас'
-                        else:
-                            start = f'Через {verification_time} минут'
+                        searched_lesson = lesson
+                        break
 
-                        group_number = ''
-                        if flag and lesson['groupNumber'] != '':
-                            group_number = f"Подгруппа: №{lesson['groupNumber']}\n"
+        if sub['subgroup'] != '0' \
+            and sub['subgroup'] not in searched_lesson['groupNumber'] \
+            and searched_lesson['groupNumber'] != '' \
+                or searched_lesson == '':
+            continue
+        else:
+            sub_preference = json.loads(sub['preferences'])['notification_type']
+            audName = ''
+            if searched_lesson['audName'] in 'ВКС/ЭТ':
+                if sub_preference == 'full-time':
+                    continue
+            else:
+                if sub_preference == 'distant':
+                    continue
+                audName = f"Аудитория: {searched_lesson['audName']}\n"
 
-                        audName = ''
-                        if lesson['audName'] != 'ВКС' and lesson['audName'] != 'ЭТ':
-                            audName = f"Аудитория: {lesson['audName']}\n"
+            start = ''
+            if verification_time == 60:
+                start = 'Через час'
+            elif verification_time == 0:
+                start = 'Сейчас'
+            else:
+                start = f'Через {verification_time} минут'
 
-                        links = json.loads(
-                            db.get('users', 'link', 'user_id', sub['user_id']))
-                        searched_link = ''
-                        for link in links:
-                            # Может реализовать по совпадениям?
-                            if link[0] == lesson['lessonName'] or link[0] == lesson['teacherName']:
-                                searched_link = f'\nСсылка на пару: {link[-1]}'
-                                break
+            group_number = ''
+            if sub['subgroup'] == '0' and searched_lesson['groupNumber'] != '':
+                group_number = f"Подгруппа: №{searched_lesson['groupNumber']}\n"
 
-                        message = (
-                            f"{start} начнётся {lesson['number'][0]} пара:\n"
-                            f"{lesson['lessonName']}\n"
-                            f"{lesson['lessonType']}\n"
-                            f"{group_number}"
-                            f"Преподаватель: {lesson['teacherName']}\n"
-                            f"{audName}"
-                            f"{searched_link}"
-                        )
-                        receivers.append(
-                            {'user_id': sub['user_id'], 'message': message})
+            lessonType = ''
+            if searched_lesson['lessonType'] != searched_lesson['lessonName']:
+                lessonType = f"{searched_lesson['lessonType']}\n"
+
+            links = json.loads(
+                db.get('users', 'link', 'user_id', sub['user_id']))
+            searched_link = ''
+            for link in links:
+                # Может реализовать по совпадениям?
+                if link[0] == searched_lesson['lessonName'] or link[0] == searched_lesson['teacherName']:
+                    searched_link = f'\nСсылка на пару: {link[-1]}'
+                    break
+
+            message = (
+                f"{start} начнётся {searched_lesson['number'][0]} пара:\n"
+                f"{searched_lesson['lessonName']}\n"
+                f"{lessonType}"
+                f"{group_number}"
+                f"Преподаватель: {searched_lesson['teacherName']}\n"
+                f"{audName}"
+                f"{searched_link}"
+            )
+            receivers.append(
+                {'user_id': sub['user_id'], 'message': message})
+
     return receivers
 
 

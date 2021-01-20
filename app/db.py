@@ -37,7 +37,7 @@ def init_db():
         user_id TEXT PRIMARY KEY,
         group_code INT,
         subgroup TEXT,
-        notifications INT,
+        notifications BOOL,
         schedule_cur_week JSON,
         schedule_next_week JSON,
         link JSON,
@@ -128,9 +128,9 @@ def get(table, *args):
         return -1
 
 
-def fetchall(table, columns):
+def fetchall(table, columns, where=''):
     columns_joined = ', '.join(columns)
-    cursor.execute(f"SELECT {columns_joined} FROM {table}")
+    cursor.execute(f"SELECT {columns_joined} FROM {table} {where}")
     rows = cursor.fetchall()
     result = []
     for row in rows:

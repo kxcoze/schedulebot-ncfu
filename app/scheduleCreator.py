@@ -83,21 +83,27 @@ class SelParser:
         # options.add_argument('--headless')
         browser = webdriver.Firefox(options=options)
         browser.get(self.URL)
-        elements = browser.find_elements_by_class_name('item')
-        cur_week_html = browser.page_source
-        index_to_click = -1
-        for index, element in enumerate(elements):
-            if 'selected' in element.get_attribute('class'):
-                index_to_click = index + 1
-                break
-        time.sleep(1)
-        elements[index_to_click].click()
-        next_week_html = browser.page_source
-        browser.quit()
+        cur_week_html, next_week_html = '', ''
+        try:
+            elements = browser.find_elements_by_class_name('item')
+            cur_week_html = browser.page_source
+            index_to_click = -1
+            for index, element in enumerate(elements):
+                if 'selected' in element.get_attribute('class'):
+                    index_to_click = index + 1
+                    break
+            time.sleep(1)
+            elements[index_to_click].click()
+            next_week_html = browser.page_source
+        except Exception as e:
+            print(e)
+        finally:
+            browser.quit()
+
         return cur_week_html, next_week_html
 
 
-# Used for writiting in files
+# Used for writing in files
 class WriterInFiles:
     def write_in_txt(self, data: str, filename='schedule.txt'):
         with open(filename, 'w') as f:
@@ -169,7 +175,7 @@ def update_schedule_user(user_id, group_code, group_subnum):
 
 def get_formatted_schedule(user_id, range, requested_week='cur'):
     schedulejs = json.loads(
-            db.get('users', f'schedule_{requested_week}_week', 'user_id', user_id))
+           db.get('users', f'schedule_{requested_week}_week', 'user_id', user_id))
 
     today = datetime.today().isoweekday()-1
     tom = 0 if today + 1 > 6 else today + 1
@@ -185,10 +191,12 @@ def get_formatted_schedule(user_id, range, requested_week='cur'):
                 4: 'Пятница',
                 5: 'Суббота',
                 6: 'Воскресенье'}
+
     for key in date_dict.keys():
         if range in key:
             range = key
             break
+
     date_to_operate = days_week[date_dict[range]]
 
     if range == 'today':
@@ -205,60 +213,46 @@ def get_formatted_schedule(user_id, range, requested_week='cur'):
     if range != 'week':
         schedulejs = [x for x in schedulejs if x['weekday'] == date_to_operate]
 
-    flag = True
-    copied_schedulejs = []
-    user_subgroup = db.get('users', 'subgroup', 'user_id', user_id)
-    for ind, day in enumerate(schedulejs):
-        copied_schedulejs.append({'weekday': day['weekday'],
-                                  'date': day['date'],
-                                  'lessons': []})
-        for lesson in day['lessons']:
-            for group_number in lesson['groupNumber'].split(', '):
-                if group_number == user_subgroup:
-                    flag = False
-                    copied_schedulejs[ind]['lessons'].append(lesson)
-                elif group_number == '':
-                    copied_schedulejs[ind]['lessons'].append(lesson)
-
-    if not len(copied_schedulejs) > 0:
+    user_subgroup = db.get(
+        'users', 'subgroup', 'user_id', user_id)
+    if not len(schedulejs) > 0:
         return f"<b><em>На {weekday} доступного расписания нет!</em></b>"
-    elif flag:
-        copied_schedulejs = schedulejs
 
     formatted_schedule = f'<b><em>Расписание занятий на {weekday}</em></b>\n\n'
-    for day in copied_schedulejs:
-        formatted_schedule += ''.join(
-                '<b>'+day['weekday']+', '+day['date']+'</b>\n')
+    for day in schedulejs:
+        formatted_schedule += f"<b>{day['weekday']}, {day['date']}</b>\n"
 
         for lesson in day['lessons']:
+            if user_subgroup != '0' and user_subgroup not in lesson['groupNumber'] and lesson['groupNumber'] != '':
+                continue
             numb_para, time_para = lesson['number'].split(', ')
-
-            groupNumber = ''
-            if flag and lesson['groupNumber'] != '':
-                groupNumber = lesson['groupNumber']+'-я подгруппа, '
-
-            eod = '\n\n'
-            if lesson == day['lessons'][-1]:
-                eod = '\n\n\n'
 
             audName = lesson['audName']
 
             lessonType = ', '
             if len(lesson['lessonType'].split()) > 1:
                 lessonT = lesson['lessonType'].split()
-                for i in lessonT:
-                    lessonType += i[0].upper()
+                for str in lessonT:
+                    lessonType += str[0].upper()
             else:
                 lessonType += lesson['lessonType'].strip()
 
-            formatted_schedule += ''.join(
-                    numb_para
-                    + ' <em>('+time_para+')</em>\n'
-                    + lesson['lessonName']
-                    + ', '+audName
-                    + lessonType+', '
-                    + groupNumber
-                    + lesson['teacherName']+eod
+            groupNumber = ''
+            if user_subgroup == '0' and lesson['groupNumber'] != '':
+                groupNumber = f"{lesson['groupNumber']}-я подгруппа, "
+
+            eod = '\n\n'
+            if lesson == day['lessons'][-1]:
+                eod = '\n\n\n'
+
+            formatted_schedule += (
+                    f"{numb_para} "
+                    f"<em>({time_para})</em>\n"
+                    f"{lesson['lessonName']}, "
+                    f"{audName}"
+                    f"{lessonType}, "
+                    f"{groupNumber}"
+                    f"{lesson['teacherName']}{eod}"
             )
 
     return formatted_schedule
@@ -329,6 +323,11 @@ def _get_schedule_bell_ncfu():
             '7': '18:30 - 20:00',
             '8': '20:10 - 21:40'}
     return bell
+
+
+def _get_meaning_of_preferences():
+    meaning = {'all': "Очный/ВКС", 'full-time': 'Очный', 'distant': 'ВКС'}
+    return meaning
 
 
 def main():

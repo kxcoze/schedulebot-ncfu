@@ -43,12 +43,13 @@ class AddStates(StatesGroup):
 
 @dp.message_handler(commands=['start'])
 async def initializebot(message: types.Message):
+    """Добавить клавиатуру"""
     """Приветствие от бота по команде /start"""
     """Возможно здесь стоит добавить юзера в базу данных"""
     await message.answer(
             "Привет! \n"
             "Я бот для расписаний СКФУ! \n"
-            "Для просмотра всех команд наберите /help \n"
+            "Для просмотра всех команд наберите /help \n\n"
             "<em>Powered by aiogram.</em>", parse_mode='HTML')
 
 
@@ -66,6 +67,41 @@ async def send_help_commands(message: types.Message, state: FSMContext):
             "/bell - Посмотреть расписание звонков \n"
             "/notifyme - Подписаться на уведомления о начале пары \n"
             "/stopnotifyme - Отписаться от уведомлений ")
+
+
+@dp.message_handler(commands=['settings'], state='*')
+async def show_user_settings(message: types.Message, state: FSMContext):
+    """Добавить клавиатуру"""
+    await state.finish()
+    # Добавить обработку отсутствия пользователя в БД
+    data_dict = db.fetchall(
+        'users',
+        ('group_code', 'subgroup', 'notifications', 'preferences'),
+        f"WHERE user_id={message.chat.id}"
+    )[0]
+    group_name = db.get(
+        'univer_code', 'group_name', 'group_code', f"{data_dict['group_code']}"
+    )
+    group_name = group_name[0:3].upper() + group_name[3:]
+    subgroup = data_dict['subgroup'].replace('0', 'Отсутствует')
+    notifications = data_dict['notifications']
+    if notifications == 1:
+        notifications = "Да"
+    else:
+        notifications = "Нет"
+    meaning = SC._get_meaning_of_preferences()
+    preferences = json.loads(data_dict['preferences'])
+    await message.answer(
+        "<em><b>Ваши настройки</b></em>\n"
+        f"Название группы: <b>{group_name}</b>\n"
+        f"Номер подгруппы: <b>{subgroup}</b>\n"
+        f"Подписаны на уведомления: <b>{notifications}</b>\n"
+        "За сколько минут Вас оповещать: "
+        f"<b>{preferences['pref_time']} мин.</b>\n"
+        "Какой тип пар уведомляется: "
+        f"<b>{meaning[preferences['notification_type']]}</b>\n",
+        parse_mode='HTML'
+    )
 
 
 @dp.message_handler(commands=['setgroup'], state=None)
@@ -105,15 +141,24 @@ async def wait_for_group_name(message: types.Message, state: FSMContext):
     if not group_code == -1:
         answer_success = await message.answer("Группа найдена, пробуем загрузить Ваше расписание...")
         try:
-            await asyncio.get_running_loop().run_in_executor(ex, SC.update_schedule_user, message.chat.id, group_code, group_subnum)
-        except Exception as e:
-            print(e)
-        finally:
+            await asyncio.get_running_loop().run_in_executor(
+                ex, SC.update_schedule_user,
+                message.chat.id, group_code, group_subnum
+            )
             await bot.edit_message_text(
                 chat_id=message.chat.id,
                 message_id=answer_success.message_id,
                 text="Расписание на неделю загружено!\n"
-                     "Вы можете просмотреть его используя команду /week")
+                     "Вы можете просмотреть его используя команду /week"
+            )
+        except Exception as e:
+            print(e)
+            await bot.edit_message_text(
+                chat_id=message.chat.id,
+                message_id=answer_success.message_id,
+                text="Произошла непредвиденная ошибка!\n"
+                     "Пожалуйста, попробуйте позже.")
+        finally:
             await state.finish()
     else:
         await message.reply("Введенная группа не существует, попробуйте снова")
@@ -157,7 +202,7 @@ async def set_user_notification(message: types.Message):
         print(e)
     await message.reply(
         "Вы успешно подписались на уведомления о начале пары!\n\n"
-        f"Время за которое Вас уведомлять о начале пары: {pref_time} минут\n"
+        f"Время за которое Вас уведомлять о начале пары: {pref_time} мин.\n"
         "Желаете ли определить время за которое Вас оповещать?\n"
         "Если да, нажмите/введите /setpreferences"
     )
@@ -176,6 +221,7 @@ async def command_set_user_preferences(message: types.Message, state: FSMContext
 
 @dp.callback_query_handler(ik.cbd_poll.filter(id='0'), state='*')
 async def query_set_user_preferences(query: types.CallbackQuery, state: FSMContext):
+    await query.answer()
     await state.finish()
     text, markup = ik.show_optional_ikeyboard()
     await bot.edit_message_text(
@@ -191,8 +237,8 @@ async def query_set_user_preferences(query: types.CallbackQuery, state: FSMConte
 async def wait_user_time_preferences(query: types.CallbackQuery, state: FSMContext):
     await query.answer()
     answer = (
-        "Для установки времени уведомления начала пары, "
-        "напишите число от 0 до 60\n"
+        "Укажите за сколько минут Вас уведомлять о начале пары \n"
+        "(от 0 до 60 минут):\n"
     )
     await bot.send_message(
                 text=answer,
@@ -232,12 +278,11 @@ async def wait_user_type_preferences(query: types.CallbackQuery):
             reply_markup=markup,
             parse_mode='HTML',
     )
-    # await MainStates.add_time_preference.set()
 
 
 @dp.callback_query_handler(ik.cbd_choice.filter(action='choose'), state='*')
 async def set_user_type_preferences(query: types.CallbackQuery, callback_data: typing.Dict[str, str]):
-    await query.answer()
+    await query.answer('Успешно!')
     # Добавить обработку отсутствия пользователя в БД
     preferences = json.loads(
         db.get('users', 'preferences', 'user_id', query.from_user.id))
@@ -263,6 +308,7 @@ async def print_commands(message: types.Message):
 
 @dp.message_handler(commands=['links'], state='*')
 async def cmd_start(message: types.Message, state: FSMContext):
+    # Добавить обработку отсутствия пользователя в БД
     await state.finish()
     try:
         text, markup = lm.show_page(message.chat.id)
