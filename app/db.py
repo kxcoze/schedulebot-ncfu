@@ -5,8 +5,8 @@ import threading
 import parsingSchedule
 
 # /home/kxcoze/py/projects/schedulebot-ncfu/app/db/users_codes.db
-# conn = sqlite3.connect(os.path.join("db", "users_codes.db"), check_same_thread=False)
-conn = sqlite3.connect("/home/kxcoze/py/projects/schedulebot-ncfu/app/db/users_codes.db", check_same_thread=False)
+conn = sqlite3.connect(os.path.join("db", "users_codes.db"), check_same_thread=False)
+# conn = sqlite3.connect("/home/kxcoze/py/projects/schedulebot-ncfu/app/db/users_codes.db", check_same_thread=False)
 cursor = conn.cursor()
 
 lock = threading.Lock()
