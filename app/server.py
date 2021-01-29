@@ -50,7 +50,9 @@ async def initializebot(message: types.Message):
             "Привет! \n"
             "Я бот для расписаний СКФУ! \n"
             "Для просмотра всех команд наберите /help \n\n"
-            "<em>Powered by aiogram.</em>", parse_mode='HTML')
+            "<em>Powered by aiogram.</em>",
+            parse_mode='HTML',
+    )
 
 
 @dp.message_handler(commands=['help'], state='*')
@@ -58,15 +60,32 @@ async def send_help_commands(message: types.Message, state: FSMContext):
     """Вывод всех возможных команд бота"""
     await state.finish()
     await message.answer(
-            "Список всех команд: \n"
+            "<b><em>Список всех команд:</em></b> \n"
+
+            "<em>Команды для настройки бота:</em> \n"
             "/setgroup - Ввод группы для показа расписания \n"
+            "/links - Интерфейс для работы со ссылками \n"
+            "/notifyme - Подписаться на уведомления о начале пары \n"
+            "/stopnotifyme - Отписаться от уведомлений \n"
+            "/setpreferences - Настройка предпочтений по уведомлениям \n\n"
+
+            "<em>Команды для просмотра расписания:</em> \n"
             "/today - Посмотреть расписание на сегодня \n"
             "/tommorow или /tom - Посмотреть расписание на завтра \n"
+            "<em>Последующие команды поддерживают наличие префикса "
+            "<b>next-</b> для просмотра расписания на следующую неделю</em> \n"
             "/week - Посмотреть расписание на неделю \n"
-            "/links - Интерфейс для работы со ссылками \n"
-            "/bell - Посмотреть расписание звонков \n"
-            "/notifyme - Подписаться на уведомления о начале пары \n"
-            "/stopnotifyme - Отписаться от уведомлений ")
+            "/monday или /mon - Просмотр расписания на понедельник \n"
+            "/tuesday или /tue - Просмотр расписания на вторник \n"
+            "/wednesday или /wed - Просмотр расписания на среду \n"
+            "/thursday или /thu - Просмотр расписания на четверг \n"
+            "/friday или /fri - Просмотр расписания на пятницу \n"
+            "/saturday или /sat - Просмотр расписания на субботу \n\n"
+
+            "<em>Опциональные команды: </em>\n"
+            "/bell - Посмотреть расписание звонков \n\n",
+            parse_mode='HTML',
+    )
 
 
 @dp.message_handler(commands=['settings'], state='*')
@@ -178,11 +197,9 @@ async def show_user_schedule_cur_week(message: types.Message, regexp_command=Non
 
     group_code = db.get('users', 'group_code', 'user_id', message.chat.id)
     if not group_code == -1:
-        """
         schedule = await asyncio.get_running_loop().run_in_executor(
                 ex, SC.get_formatted_schedule, message.chat.id, command, week)
-        """
-        schedule = SC.get_formatted_schedule(message.chat.id, command, week)
+        # schedule = SC.get_formatted_schedule(message.chat.id, command, week)
         await message.answer(schedule, parse_mode='HTML')
     else:
         await message.reply(

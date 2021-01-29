@@ -1,19 +1,22 @@
+import os
 import json
-import sqlite3
+import s3m
 import threading
 
 import parsingSchedule
 
-# /home/kxcoze/py/projects/schedulebot-ncfu/app/db/users_codes.db
-# conn = sqlite3.connect(os.path.join("db", "users_codes.db"), check_same_thread=False)
-conn = sqlite3.connect("/home/kxcoze/py/projects/schedulebot-ncfu/app/db/users_codes.db", check_same_thread=False)
-cursor = conn.cursor()
+conn = s3m.connect(
+    os.path.join(os.path.realpath('app'), 'db', 'users_codes.db'),
+    isolation_level=None,
+    check_same_thread=False
+)
 
-lock = threading.Lock()
+cursor = conn.cursor()
 
 
 def lock_thread(main_thread=False):
     def decorator(func):
+        lock = threading.Lock()
 
         def wrapper(*args, **kwargs):
             if main_thread or threading.current_thread() is not threading.main_thread():
@@ -55,7 +58,7 @@ def init_db():
     conn.commit()
 
 
-@lock_thread(main_thread=True)
+# @lock_thread(main_thread=True)
 def insert_codes():
     try:
         delete_table('univer_code')
@@ -64,24 +67,27 @@ def insert_codes():
         pass
     finally:
         init_db()
-
-    data = parsingSchedule.get_codes()
-    # [0] - Институт, [1] - Специальность, [2] - Группа, [3] - Код группы
-    data_to_insert = ['', '', '', '']
-    for item in data:
-        data_to_insert[0] = item['instituteName'].lower()
-        for speciality in item['specialities']:
-            data_to_insert[1] = speciality['specialityName'].lower()
-            for group in speciality['groups']:
-                data_to_insert[2] = group['groupName'].lower()
-                data_to_insert[3] = group['groupCode'].lower()
-                # Возможно стоит отправлять результаты вставки в логи?
-                try:
-                    print("NEW DATA -> ", data_to_insert)
-                    cursor.execute("INSERT INTO univer_code VALUES (?,?,?,?)", tuple(data_to_insert))
-                    conn.commit()
-                except:
-                    print("ALREADY HAS -> ", data_to_insert)
+    with cursor:
+        data = parsingSchedule.get_codes()
+        # [0] - Институт, [1] - Специальность, [2] - Группа, [3] - Код группы
+        data_to_insert = ['', '', '', '']
+        for item in data:
+            data_to_insert[0] = item['instituteName'].lower()
+            for speciality in item['specialities']:
+                data_to_insert[1] = speciality['specialityName'].lower()
+                for group in speciality['groups']:
+                    data_to_insert[2] = group['groupName'].lower()
+                    data_to_insert[3] = group['groupCode'].lower()
+                    # Возможно стоит отправлять результаты вставки в логи?
+                    try:
+                        print("NEW DATA -> ", data_to_insert)
+                        cursor.execute(
+                            "INSERT INTO univer_code VALUES (?,?,?,?)",
+                            tuple(data_to_insert),
+                        )
+                        conn.commit()
+                    except:
+                        print("ALREADY HAS -> ", data_to_insert)
 
 
 def insert(table, *args):

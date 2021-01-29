@@ -5,6 +5,7 @@ import time
 from typing import List
 from datetime import datetime
 
+
 from bs4 import BeautifulSoup as BS4
 from selenium import webdriver
 
@@ -94,6 +95,7 @@ class SelParser:
                     break
             time.sleep(1)
             elements[index_to_click].click()
+            time.sleep(1)
             next_week_html = browser.page_source
         except Exception as e:
             print(e)
@@ -162,7 +164,8 @@ def update_schedule_user(user_id, group_code, group_subnum):
                 schedule_cur_week=schedule_weeks[0],
                 schedule_next_week=schedule_weeks[1],
         )
-    except db.sqlite3.IntegrityError:
+    except Exception as e:
+        print('cringe:', e)
         db.update(
                 'users',
                 (('group_code', group_code),
@@ -215,6 +218,7 @@ def get_formatted_schedule(user_id, range, requested_week='cur'):
 
     user_subgroup = db.get(
         'users', 'subgroup', 'user_id', user_id)
+
     if not len(schedulejs) > 0:
         return f"<b><em>На {weekday} доступного расписания нет!</em></b>"
 
