@@ -1,3 +1,4 @@
+import os
 import logging
 import re
 import asyncio
@@ -17,7 +18,7 @@ import taskmanager as tasks
 import linkmanager as lm
 import inlinekeyboard as ik
 
-API_TOKEN = '1458781343:AAEN9-LvDZeOKa3fn738zgDpqVssqFIJ-Ok'
+API_TOKEN = os.getenv('API_TOKEN')
 
 main_commands_viewing_schedule, optional_commands_viewing_schedule = SC.get_every_aliases_days_week()
 

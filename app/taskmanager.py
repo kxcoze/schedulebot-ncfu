@@ -9,8 +9,8 @@ from aiogram import Bot
 
 import db
 import schedulecreator as SC
+from server import API_TOKEN
 
-API_TOKEN = '1458781343:AAEN9-LvDZeOKa3fn738zgDpqVssqFIJ-Ok'
 
 bot = Bot(token=API_TOKEN)
 
