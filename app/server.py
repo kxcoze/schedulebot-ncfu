@@ -12,8 +12,8 @@ from aiogram.dispatcher import FSMContext, filters
 from aiogram.utils.exceptions import MessageNotModified
 
 import db
-import scheduleCreator as SC
-import schedulerForTasks as tasks
+import schedulecreator as SC
+import taskmanager as tasks
 import linkmanager as lm
 import inlinekeyboard as ik
 

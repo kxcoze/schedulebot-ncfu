@@ -1,6 +1,5 @@
 import requests
 import json
-import csv
 import time
 from typing import List
 from datetime import datetime
@@ -13,9 +12,6 @@ import db
 
 # Used for parsing data from html code
 class Parser:
-    def post_url(self, url: str, req):
-        r = requests.post(url, json=req)
-        return r.json()
 
     def get_html(self, url: str):
         r = requests.get(url)
@@ -104,26 +100,6 @@ class SelParser:
             browser.quit()
 
         return cur_week_html, next_week_html
-
-
-# Used for writing in files
-class WriterInFiles:
-    def write_in_txt(self, data: str, filename='schedule.txt'):
-        with open(filename, 'w') as f:
-            f.write(data)
-
-    def write_in_csv(self, rec_data, data: List, filename='nfcu_schedule.csv'):
-        with open(filename, 'a+') as f:
-            writer = csv.writer(f)
-            for i in rec_data:
-                writer.writerow((i['instituteName'],
-                                 data['instituteId'],
-                                 i['Name'],
-                                 data['branchId']))
-
-    def write_in_json(self, data: List, filename='ncfu_schedule.json'):
-        with open(filename, 'w', encoding='utf-8') as f:
-            json.dump(data, f, indent=4, ensure_ascii=False)
 
 
 def get_json_schedule(code_group):
@@ -329,18 +305,3 @@ def _get_schedule_bell_ncfu():
 def _get_meaning_of_preferences():
     meaning = {'all': "Очный/ВКС", 'full-time': 'Очный', 'distant': 'ВКС'}
     return meaning
-
-
-def main():
-    # url = 'https://ecampus.ncfu.ru/schedule/group/14904'
-    # parser = SelParser(url)
-    # parser.get_schedule_html()
-    # pprint(get_json_schedule(14904), indent=6)
-    # print(get_every_aliases_days_week())
-    print(_get_schedule_bell_ncfu()['3'])
-
-
-if __name__ == '__main__':
-    #
-    # get_formatted_schedule(input(), input())
-    main()

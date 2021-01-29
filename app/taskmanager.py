@@ -8,7 +8,7 @@ import schedule
 from aiogram import Bot
 
 import db
-import scheduleCreator as SC
+import schedulecreator as SC
 
 API_TOKEN = '1458781343:AAEN9-LvDZeOKa3fn738zgDpqVssqFIJ-Ok'
 

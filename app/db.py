@@ -3,7 +3,7 @@ import json
 import s3m
 import threading
 
-import parsingSchedule
+import scraper
 
 conn = s3m.connect(
     os.path.join(os.path.realpath('app'), 'db', 'users_codes.db'),
@@ -68,7 +68,7 @@ def insert_codes():
     finally:
         init_db()
     with cursor:
-        data = parsingSchedule.get_codes()
+        data = scraper.get_codes()
         # [0] - Институт, [1] - Специальность, [2] - Группа, [3] - Код группы
         data_to_insert = ['', '', '', '']
         for item in data:
