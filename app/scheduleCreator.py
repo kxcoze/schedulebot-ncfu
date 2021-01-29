@@ -5,10 +5,8 @@ import time
 from typing import List
 from datetime import datetime
 
-
 from bs4 import BeautifulSoup as BS4
 from selenium import webdriver
-
 
 import db
 
@@ -71,17 +69,20 @@ class SelParser:
 
     def get_jshtml(self):
         options = webdriver.FirefoxOptions()
-        # options.add_argument('--headless')
+        options.add_argument('--headless')
         browser = webdriver.Firefox(options=options)
-        browser.get(self.URL)
-        html = browser.page_source
-        browser.quit()
+        html = ''
+        try:
+            browser.get(self.URL)
+            html = browser.page_source
+        finally:
+            browser.quit()
 
         return html
 
     def get_schedule_html(self):
         options = webdriver.FirefoxOptions()
-        # options.add_argument('--headless')
+        options.add_argument('--headless')
         browser = webdriver.Firefox(options=options)
         browser.get(self.URL)
         cur_week_html, next_week_html = '', ''
@@ -222,9 +223,9 @@ def get_formatted_schedule(user_id, range, requested_week='cur'):
     if not len(schedulejs) > 0:
         return f"<b><em>На {weekday} доступного расписания нет!</em></b>"
 
-    formatted_schedule = f'<b><em>Расписание занятий на {weekday}</em></b>\n\n'
+    formatted_schedule = f'<b><em>Расписание занятий на {weekday}</em></b>\n'
     for day in schedulejs:
-        formatted_schedule += f"<b>{day['weekday']}, {day['date']}</b>\n"
+        formatted_schedule += f"\n<b>{day['weekday']}, {day['date']}</b>\n"
 
         for lesson in day['lessons']:
             if user_subgroup != '0' and user_subgroup not in lesson['groupNumber'] and lesson['groupNumber'] != '':
@@ -245,10 +246,6 @@ def get_formatted_schedule(user_id, range, requested_week='cur'):
             if user_subgroup == '0' and lesson['groupNumber'] != '':
                 groupNumber = f"{lesson['groupNumber']}-я подгруппа, "
 
-            eod = '\n\n'
-            if lesson == day['lessons'][-1]:
-                eod = '\n\n\n'
-
             formatted_schedule += (
                     f"{numb_para} "
                     f"<em>({time_para})</em>\n"
@@ -256,7 +253,7 @@ def get_formatted_schedule(user_id, range, requested_week='cur'):
                     f"{audName}"
                     f"{lessonType}, "
                     f"{groupNumber}"
-                    f"{lesson['teacherName']}{eod}"
+                    f"{lesson['teacherName']}\n\n"
             )
 
     return formatted_schedule

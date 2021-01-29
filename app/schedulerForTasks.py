@@ -71,7 +71,7 @@ def prepare_receivers(cur_lesson):
                         searched_lesson = lesson
                         break
 
-        if sub['subgroup'] != '0' \
+        if sub['subgroup'] != '0' and searched_lesson != '' \
             and sub['subgroup'] not in searched_lesson['groupNumber'] \
             and searched_lesson['groupNumber'] != '' \
                 or searched_lesson == '':

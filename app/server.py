@@ -21,7 +21,7 @@ API_TOKEN = '1458781343:AAEN9-LvDZeOKa3fn738zgDpqVssqFIJ-Ok'
 
 main_commands_viewing_schedule, optional_commands_viewing_schedule = SC.get_every_aliases_days_week()
 
-ex = ThreadPoolExecutor(max_workers=1)
+ex = ThreadPoolExecutor(max_workers=2)
 
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
@@ -82,7 +82,8 @@ async def send_help_commands(message: types.Message, state: FSMContext):
             "/friday или /fri - Просмотр расписания на пятницу \n"
             "/saturday или /sat - Просмотр расписания на субботу \n\n"
 
-            "<em>Опциональные команды: </em>\n"
+            "<em>Опциональные команды: </em> \n"
+            "/settings - Посмотреть текущие настройки \n"
             "/bell - Посмотреть расписание звонков \n\n",
             parse_mode='HTML',
     )
@@ -197,9 +198,7 @@ async def show_user_schedule_cur_week(message: types.Message, regexp_command=Non
 
     group_code = db.get('users', 'group_code', 'user_id', message.chat.id)
     if not group_code == -1:
-        schedule = await asyncio.get_running_loop().run_in_executor(
-                ex, SC.get_formatted_schedule, message.chat.id, command, week)
-        # schedule = SC.get_formatted_schedule(message.chat.id, command, week)
+        schedule = SC.get_formatted_schedule(message.chat.id, command, week)
         await message.answer(schedule, parse_mode='HTML')
     else:
         await message.reply(
