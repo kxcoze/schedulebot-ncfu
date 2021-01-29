@@ -1,1 +1,1 @@
-web: python3 app/server.py
+service: python3 app/server.py
