@@ -1,0 +1,13 @@
+1611930910764	geckodriver	INFO	Listening on 127.0.0.1:36047
+1611930910772	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilemNe1lp"
+*** You are running in headless mode.
+console.info: MINT: Trying to use the system region (based on LANG).
+console.info: MINT: System region is US
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1611930914477	Marionette	INFO	Listening on port 34667
+1611930914506	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.info: MINT: Loading search-config defaults.
+JavaScript error: resource://gre/modules/TelemetryUtils.jsm, line 161: TypeError: date is undefined
+JavaScript error: https://ecampus.ncfu.ru/scripts/bundles/knockoutValidation?v=aKfPRkIlQM3ZMkLURTSM0LLHfyLoUqUxpiPOixKgIwM1, line 1: TypeError: core.res.Plan is undefined
+1611930920289	Marionette	INFO	Stopped listening on port 34667
+JavaScript error: resource://gre/modules/UrlClassifierListManager.jsm, line 691: TypeError: this.tablesData[table] is undefined
