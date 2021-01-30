@@ -9,8 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-
-# GECKODRIVER_PATH = os.getenv('GECKODRIVER_PATH')
+CHROMEDRIVER_PATH = os.getenv('CHROMEDRIVER_PATH')
 
 
 class SelScrapingSchedule:
@@ -45,9 +44,10 @@ class SelScrapingSchedule:
            страницы в переменную класса html"""
         try:
             url = 'https://ecampus.ncfu.ru/schedule'
-            options = webdriver.FirefoxOptions()
+            options = webdriver.ChromeOptions()
             options.add_argument('--headless')
-            browser = webdriver.Firefox(options=options)
+            browser = webdriver.Chrome(
+                executable_path=CHROMEDRIVER_PATH, options=options)
             browser.get(url)
         except:
             self.restart_script(browser)
@@ -168,9 +168,10 @@ class SelParser:
         self.URL = url
 
     def get_jshtml(self):
-        options = webdriver.FirefoxOptions()
+        options = webdriver.ChromeOptions()
         options.add_argument('--headless')
-        browser = webdriver.Firefox(options=options)
+        browser = webdriver.Chrome(
+            executable_path=CHROMEDRIVER_PATH, options=options)
         html = ''
         try:
             browser.get(self.URL)
@@ -181,9 +182,10 @@ class SelParser:
         return html
 
     def get_schedule_html(self):
-        options = webdriver.FirefoxOptions()
+        options = webdriver.ChromeOptions()
         options.add_argument('--headless')
-        browser = webdriver.Firefox(options=options)
+        browser = webdriver.Chrome(
+            executable_path=CHROMEDRIVER_PATH, options=options)
         browser.get(self.URL)
         cur_week_html, next_week_html = '', ''
         try:
