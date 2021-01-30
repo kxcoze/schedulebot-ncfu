@@ -1,3 +1,4 @@
+import requests
 import time
 
 import subprocess
@@ -42,8 +43,9 @@ class SelScrapingSchedule:
         try:
             url = 'https://ecampus.ncfu.ru/schedule'
             options = webdriver.FirefoxOptions()
-            # options.add_argument('--headless')
-            browser = webdriver.Firefox(options=options)
+            options.add_argument('--headless')
+            browser = webdriver.Firefox(
+                executable_path='/usr/local/bin/geckodriver', options=options)
             browser.get(url)
         except:
             self.restart_script(browser)
@@ -156,6 +158,99 @@ class ParserSchedule:
             data_from_schedule.append(data_instit)
 
         return data_from_schedule
+
+
+# Used for parsing pages with JS
+class SelParser:
+    def __init__(self, url):
+        self.URL = url
+
+    def get_jshtml(self):
+        options = webdriver.FirefoxOptions()
+        options.add_argument('--headless')
+        browser = webdriver.Firefox(
+            executable_path='/usr/local/bin/geckodriver', options=options)
+        html = ''
+        try:
+            browser.get(self.URL)
+            html = browser.page_source
+        finally:
+            browser.quit()
+
+        return html
+
+    def get_schedule_html(self):
+        options = webdriver.FirefoxOptions()
+        options.add_argument('--headless')
+        browser = webdriver.Firefox(options=options)
+        browser.get(self.URL)
+        cur_week_html, next_week_html = '', ''
+        try:
+            elements = browser.find_elements_by_class_name('item')
+            cur_week_html = browser.page_source
+            index_to_click = -1
+            for index, element in enumerate(elements):
+                if 'selected' in element.get_attribute('class'):
+                    index_to_click = index + 1
+                    break
+            time.sleep(1)
+            elements[index_to_click].click()
+            time.sleep(1)
+            next_week_html = browser.page_source
+        except Exception as e:
+            print(e)
+        finally:
+            browser.quit()
+
+        return cur_week_html, next_week_html
+
+
+# Used for parsing data from html code
+class Parser:
+
+    def get_html(self, url: str):
+        r = requests.get(url)
+        return r.text
+
+    def get_schedule(self, html: str):
+        soup = BS4(html, 'lxml')
+        table = soup.find(
+                'table',
+                class_='table table-hover lesson-schedule'
+        ).find('tbody').find_all('tr')
+        schedule_data = []
+        ind = -1
+        for item in table:
+            if item.find('th') is not None:
+                days = item.find_all('span')
+                weekday = days[0].text
+                date = days[1].text
+                schedule_data.append({'weekday': weekday,
+                                      'date': date,
+                                      'lessons': []})
+                ind += 1
+            elif item is not None and ind != -1:
+                stats = item.find_all('td')
+                number = ', '.join((
+                        stats[0].find('div').text.strip(),
+                        stats[0].find('div')['title'],
+                ))
+                lessonName = stats[1].text
+                audName = stats[2].text.strip().replace('\n', '')
+                lessonType = stats[3].text
+                groupNumber = stats[4].find('span').text \
+                    .replace('(', '').replace(')', '')
+
+                teacherName = stats[5].find('a').text
+                lesson = {'number': number,
+                          'lessonName': lessonName,
+                          'audName': audName,
+                          'lessonType': lessonType,
+                          'groupNumber': groupNumber,
+                          'teacherName': teacherName}
+                schedule_data[ind]['lessons'].append(lesson)
+
+        return schedule_data
 
 
 def get_codes():
