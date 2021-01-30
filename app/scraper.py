@@ -1,6 +1,6 @@
 import requests
 import time
-
+import os
 import subprocess
 
 from bs4 import BeautifulSoup as BS4
@@ -8,6 +8,9 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+
+
+GECKODRIVER_PATH = os.getenv('GECKODRIVER_PATH')
 
 
 class SelScrapingSchedule:
@@ -169,7 +172,7 @@ class SelParser:
         options = webdriver.FirefoxOptions()
         options.add_argument('--headless')
         browser = webdriver.Firefox(
-            executable_path='/usr/local/bin/geckodriver', options=options)
+            executable_path=GECKODRIVER_PATH, options=options)
         html = ''
         try:
             browser.get(self.URL)
@@ -182,7 +185,8 @@ class SelParser:
     def get_schedule_html(self):
         options = webdriver.FirefoxOptions()
         options.add_argument('--headless')
-        browser = webdriver.Firefox(options=options)
+        browser = webdriver.Firefox(
+            executable_path=GECKODRIVER_PATH, options=options)
         browser.get(self.URL)
         cur_week_html, next_week_html = '', ''
         try:
