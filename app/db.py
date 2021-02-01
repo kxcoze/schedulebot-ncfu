@@ -1,35 +1,36 @@
 import os
 import json
-import s3m
 import threading
+
+import s3m
 
 import scraper
 
 conn = s3m.connect(
     os.path.join(os.path.realpath('app'), 'db', 'users_codes.db'),
     isolation_level=None,
-    check_same_thread=False
+    check_same_thread=False,
 )
 
 cursor = conn.cursor()
 
 
-def lock_thread(main_thread=False):
-    def decorator(func):
-        lock = threading.Lock()
-
-        def wrapper(*args, **kwargs):
-            if main_thread or threading.current_thread() is not threading.main_thread():
-                lock.acquire(True)
-            return_value = func(*args, **kwargs)
-            try:
-                lock.release()
-            finally:
-                return return_value
-
-        return wrapper
-    return decorator
-
+# def lock_thread(main_thread=False):
+#     def decorator(func):
+#         lock = threading.Lock()
+#
+#         def wrapper(*args, **kwargs):
+#             if main_thread or threading.current_thread() is not threading.main_thread():
+#                 lock.acquire(True)
+#             return_value = func(*args, **kwargs)
+#             try:
+#                 lock.release()
+#             finally:
+#                 return return_value
+#
+#         return wrapper
+#     return decorator
+#
 
 def get_cursor():
     return cursor
@@ -111,6 +112,15 @@ def insert_new_user(
         links,
         json.dumps(references, ensure_ascii=False),
     )
+
+
+def check_user(user_id, **kwargs):
+    cursor.execute("SELECT user_id FROM users WHERE user_id = ?", (user_id,))
+    result = cursor.fetchone()
+    if result is None:
+        insert_new_user(user_id, **kwargs)
+    else:
+        pass
 
 
 def update(table, data, item, value):

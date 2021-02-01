@@ -30,7 +30,6 @@ def get_two_weeks_schedule(code_group):
     data = ['', '']
     for ind, week in enumerate(weeks_html):
         data[ind] = json.dumps(parser.get_schedule(week), ensure_ascii=False)
-    # pprint.pprint(data)
     return data[0], data[1]
 
 
@@ -45,8 +44,7 @@ def update_schedule_user(user_id, group_code, group_subnum):
                 schedule_cur_week=schedule_weeks[0],
                 schedule_next_week=schedule_weeks[1],
         )
-    except Exception as e:
-        print('cringe:', e)
+    except:
         db.update(
                 'users',
                 (('group_code', group_code),

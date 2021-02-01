@@ -20,11 +20,12 @@ import inlinekeyboard as ik
 
 API_TOKEN = os.getenv('API_TOKEN')
 
-main_commands_viewing_schedule, optional_commands_viewing_schedule = SC.get_every_aliases_days_week()
+main_commands_viewing_schedule, optional_commands_viewing_schedule = \
+    SC.get_every_aliases_days_week()
 
 ex = ThreadPoolExecutor(max_workers=2)
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(filename='server.log', level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 
 # Возможно стоит изменить storage
@@ -36,7 +37,7 @@ class MainStates(StatesGroup):
     add_time_preference = State()
 
 
-class AddStates(StatesGroup):
+class LinkStates(StatesGroup):
     input_link = State()
     edit_link = State()
     del_link = State()
@@ -51,7 +52,7 @@ async def initializebot(message: types.Message):
             "Привет! \n"
             "Я бот для расписаний СКФУ! \n"
             "Для просмотра всех команд наберите /help \n\n"
-            "<em>Powered by aiogram.</em>",
+            "<em>Powered by aiogram</em>",
             parse_mode='HTML',
     )
 
@@ -92,18 +93,23 @@ async def send_help_commands(message: types.Message, state: FSMContext):
 
 @dp.message_handler(commands=['settings'], state='*')
 async def show_user_settings(message: types.Message, state: FSMContext):
-    """Добавить клавиатуру"""
     await state.finish()
     # Добавить обработку отсутствия пользователя в БД
+    db.check_user(message.chat.id)
+
     data_dict = db.fetchall(
         'users',
         ('group_code', 'subgroup', 'notifications', 'preferences'),
         f"WHERE user_id={message.chat.id}"
     )[0]
-    group_name = db.get(
+    group_code = db.get(
         'univer_code', 'group_name', 'group_code', f"{data_dict['group_code']}"
     )
-    group_name = group_name[0:3].upper() + group_name[3:]
+    if not group_code == -1:
+        group_code = group_code[0:3].upper() + group_code[3:]
+    else:
+        group_code = 'Группа не определена'
+
     subgroup = data_dict['subgroup'].replace('0', 'Отсутствует')
     notifications = data_dict['notifications']
     if notifications == 1:
@@ -114,7 +120,7 @@ async def show_user_settings(message: types.Message, state: FSMContext):
     preferences = json.loads(data_dict['preferences'])
     await message.answer(
         "<em><b>Ваши настройки</b></em>\n"
-        f"Название группы: <b>{group_name}</b>\n"
+        f"Название группы: <b>{group_code}</b>\n"
         f"Номер подгруппы: <b>{subgroup}</b>\n"
         f"Подписаны на уведомления: <b>{notifications}</b>\n"
         "За сколько минут Вас оповещать: "
@@ -140,7 +146,9 @@ async def set_user_group(message: types.Message):
 @dp.message_handler(state=MainStates.waiting_for_group_name)
 async def wait_for_group_name(message: types.Message, state: FSMContext):
     # Регулярное выражение для поиска группы
-    regroup = re.compile('(([а-яА-я]-[а-яА-Я]{3}|[а-яА-Я]{3})-[а-я]+?-[а-я]+?-\d{1,3}(-[0-9а-яА-Я.]+|-\d|))|([а-яА-я]-[а-яА-Я]{1,3}-\d+)')
+    regroup = re.compile(
+        '(([а-яА-я]-[а-яА-Я]{3}|[а-яА-Я]{3})-[а-я]+?-[а-я]+?-\\d{1,3}'
+        '(-[0-9а-яА-Я.]+|-\\d|))|([а-яА-я]-[а-яА-Я]{1,3}-\\d+)')
 
     # Регулярное выражение для поиска подгруппы
     resubgroup = re.compile('[^-\\d]([0-9]{1})([^-\\d]|\\Z)')
@@ -203,15 +211,14 @@ async def show_user_schedule_cur_week(message: types.Message, regexp_command=Non
         await message.answer(schedule, parse_mode='HTML')
     else:
         await message.reply(
-            "Похоже что Вы не выбрали группу перед тем как"
-            " посмотреть расписание, пожалуйста, воспользуйтесь"
-            " командой /setgroup и укажите Вашу группу")
+            "Похоже что Вы не выбрали группу перед тем как "
+            "посмотреть расписание, пожалуйста, воспользуйтесь "
+            "командой /setgroup и укажите Вашу группу")
 
 
 @dp.message_handler(commands=['notifyme'])
 async def set_user_notification(message: types.Message):
-    # Добавить обработку отсутствия пользователя в БД
-    db.update('users', (('notifications', 1), ), 'user_id', message.chat.id)
+    db.check_user(message.chat.id)
     try:
         pref_time = json.loads(db.get(
             'users', 'preferences', 'user_id', message.chat.id))['pref_time']
@@ -223,6 +230,20 @@ async def set_user_notification(message: types.Message):
         "Желаете ли определить время за которое Вас оповещать?\n"
         "Если да, нажмите/введите /setpreferences"
     )
+
+
+@dp.message_handler(commands=['stopnotifyme'])
+async def stop_user_notification(message: types.Message):
+    # Добавить обработку отсутствия пользователя в БД
+    db.check_user(message.chat.id)
+
+    db.update('users', (('notifications', 0), ), 'user_id', message.chat.id)
+    await message.reply("Вы отписались от уведомлений о начале пары!")
+
+
+@dp.message_handler(commands=['bell'])
+async def print_commands(message: types.Message):
+    await message.answer(SC.get_formatted_schedule_bell(), parse_mode='HTML')
 
 
 @dp.message_handler(commands=['setpreferences'])
@@ -243,7 +264,7 @@ async def query_set_user_preferences(query: types.CallbackQuery, state: FSMConte
     text, markup = ik.show_optional_ikeyboard()
     await bot.edit_message_text(
         text=text,
-        chat_id=query.from_user.id,
+        chat_id=query.message.chat.id,
         message_id=query.message.message_id,
         reply_markup=markup,
         parse_mode='HTML',
@@ -258,9 +279,9 @@ async def wait_user_time_preferences(query: types.CallbackQuery, state: FSMConte
         "(от 0 до 60 минут):\n"
     )
     await bot.send_message(
-                text=answer,
-                chat_id=query.from_user.id,
-                parse_mode='HTML',
+            text=answer,
+            chat_id=query.message.chat.id,
+            parse_mode='HTML',
     )
 
     await MainStates.add_time_preference.set()
@@ -270,6 +291,8 @@ async def wait_user_time_preferences(query: types.CallbackQuery, state: FSMConte
 async def set_user_time_preferences(message: types.Message, state: FSMContext):
     if message.text.isdigit() and 0 <= int(message.text) <= 60:
         # Добавить обработку отсутствия пользователя в БД
+        db.check_user(message.chat.id)
+
         preferences = json.loads(
             db.get('users', 'preferences', 'user_id', message.chat.id))
         preferences['pref_time'] = message.text
@@ -290,7 +313,7 @@ async def wait_user_type_preferences(query: types.CallbackQuery):
     text, markup = ik.show_type_preference_ikeyboard()
     await bot.edit_message_text(
             text=text,
-            chat_id=query.from_user.id,
+            chat_id=query.message.chat.id,
             message_id=query.message.message_id,
             reply_markup=markup,
             parse_mode='HTML',
@@ -301,45 +324,29 @@ async def wait_user_type_preferences(query: types.CallbackQuery):
 async def set_user_type_preferences(query: types.CallbackQuery, callback_data: typing.Dict[str, str]):
     await query.answer('Успешно!')
     # Добавить обработку отсутствия пользователя в БД
+    db.check_user(query.message.chat.id)
+
     preferences = json.loads(
-        db.get('users', 'preferences', 'user_id', query.from_user.id))
+        db.get('users', 'preferences', 'user_id', query.message.chat.id))
     preferences['notification_type'] = callback_data['result']
     db.update(
         'users',
         (('preferences', json.dumps(preferences, ensure_ascii=False)), ),
-        'user_id', query.from_user.id
+        'user_id', query.message.chat.id
     )
-
-
-@dp.message_handler(commands=['stopnotifyme'])
-async def stop_user_notification(message: types.Message):
-    # Добавить обработку отсутствия пользователя в БД
-    db.update('users', (('notifications', 0), ), 'user_id', message.chat.id)
-    await message.reply("Вы отписались от уведомлений о начале пары!")
-
-
-@dp.message_handler(commands=['bell'])
-async def print_commands(message: types.Message):
-    await message.answer(SC.get_formatted_schedule_bell(), parse_mode='HTML')
 
 
 @dp.message_handler(commands=['links'], state='*')
 async def cmd_start(message: types.Message, state: FSMContext):
-    # Добавить обработку отсутствия пользователя в БД
     await state.finish()
-    try:
-        text, markup = lm.show_page(message.chat.id)
-    except TypeError:
-        # Если пользователь пытается работать со ссылками
-        # но его нет в БД
-        db.insert_new_user(message.chat.id)
-        text, markup = lm.show_page(message.chat.id)
-    finally:
-        await message.answer(
-                text=text,
-                reply_markup=markup,
-                parse_mode='HTML',
-        )
+    # Добавить обработку отсутствия пользователя в БД
+    db.check_user(message.chat.id)
+    text, markup = lm.show_page(message.chat.id)
+    await message.answer(
+            text=text,
+            reply_markup=markup,
+            parse_mode='HTML',
+    )
 
 
 @dp.callback_query_handler(lm.list.filter(action=['main', 'prev', 'next']),
@@ -348,7 +355,7 @@ async def query_show_prev_next_page(query: types.CallbackQuery,
                                     callback_data: typing.Dict[str, str]):
     await query.answer()
     cur_page = int(callback_data['page_num'])
-    text, markup = lm.show_page(query.from_user.id, cur_page)
+    text, markup = lm.show_page(query.message.chat.id, cur_page)
     await query.message.edit_text(
             text=text,
             reply_markup=markup,
@@ -367,10 +374,10 @@ async def query_show_link_info(query: types.CallbackQuery,
     data = re.findall(regex, message_text)
     link = data[ind % lm.WIDTH][1:]
 
-    new_ind = lm.check_existing_link(query.from_user.id, link, ind)
+    new_ind = lm.check_existing_link(query.message.chat.id, link, ind)
     if new_ind == -1:
         await query.answer('Такого номера не существует!')
-        text, markup = lm.show_page(query.from_user.id, cur_page)
+        text, markup = lm.show_page(query.message.chat.id, cur_page)
         await query.message.edit_text(
             text=text,
             reply_markup=markup,
@@ -382,7 +389,7 @@ async def query_show_link_info(query: types.CallbackQuery,
 
     try:
         await query.answer()
-        text, markup = lm.view_link_data(query.from_user.id, cur_page, ind)
+        text, markup = lm.view_link_data(query.message.chat.id, cur_page, ind)
         await query.message.edit_text(text, reply_markup=markup)
     except:
         await query.answer('Произошла непредвиденная ошибка.')
@@ -399,11 +406,11 @@ async def query_edit_info(query: types.CallbackQuery,
     link = data[1:]
 
     cur_page = int(callback_data['page_num'])
-    ind = lm.check_existing_link(query.from_user.id, link, ind)
+    ind = lm.check_existing_link(query.message.chat.id, link, ind)
     if ind == -1:
         await query.answer("Вы пытаетесь изменить несуществующую"
                            "/измененную ссылку!")
-        text, markup = lm.show_page(query.from_user.id, cur_page)
+        text, markup = lm.show_page(query.message.chat.id, cur_page)
         await query.message.edit_text(
                 text=text,
                 reply_markup=markup,
@@ -430,13 +437,13 @@ async def query_edit_info(query: types.CallbackQuery,
 
     await bot.send_message(
                 text=answer,
-                chat_id=query.from_user.id,
+                chat_id=query.message.chat.id,
                 parse_mode='HTML',
     )
-    await AddStates.edit_link.set()
+    await LinkStates.edit_link.set()
 
 
-@dp.message_handler(state=AddStates.edit_link)
+@dp.message_handler(state=LinkStates.edit_link)
 async def state_edit_link(message: types.Message, state: FSMContext):
     message_text = message.text.split('\n')[0]
     async with state.proxy() as data:
@@ -474,7 +481,7 @@ async def query_delete_link(query: types.CallbackQuery,
     ind = int(data[0])-1
     link = data[1:]
     try:
-        result = lm.delete_link_by_info(query.from_user.id, link, ind)
+        result = lm.delete_link_by_info(query.message.chat.id, link, ind)
         if result == 0:
             await query.answer('Ссылка успешно удалена!')
         elif result == -1:
@@ -483,7 +490,7 @@ async def query_delete_link(query: types.CallbackQuery,
         await query.answer('Произошла непредвиденная ошибка.')
 
     cur_page = int(callback_data['page_num'])
-    text, markup = lm.show_page(query.from_user.id, cur_page)
+    text, markup = lm.show_page(query.message.chat.id, cur_page)
     await query.message.edit_text(
             text=text,
             reply_markup=markup,
@@ -515,14 +522,14 @@ async def query_add_link(query: types.CallbackQuery,
 
     await bot.send_message(
             text=answer,
-            chat_id=query.from_user.id,
+            chat_id=query.message.chat.id,
             parse_mode='HTML',
     )
 
-    await AddStates.input_link.set()
+    await LinkStates.input_link.set()
 
 
-@dp.message_handler(state=AddStates.input_link)
+@dp.message_handler(state=LinkStates.input_link)
 async def process_link(message: types.Message, state: FSMContext):
     message_text = message.text.split('\n')
     searched_data = []
@@ -587,10 +594,10 @@ async def query_delete_link_by_num(
 
     await query.answer('Для удаления ссылки из списка напишите его номер')
 
-    if len(lm.get_links(query.from_user.id)) == 0:
+    if len(lm.get_links(query.message.chat.id)) == 0:
         await bot.send_message(
                 text="Ваш список ссылок пуст!",
-                chat_id=query.from_user.id,
+                chat_id=query.message.chat.id,
                 parse_mode='HTML',
         )
         return await state.finish()
@@ -601,11 +608,11 @@ async def query_delete_link_by_num(
 
     await bot.send_message(
             text='Для удаления ссылки из списка напишите его номер',
-            chat_id=query.from_user.id,
+            chat_id=query.message.chat.id,
             parse_mode='HTML',
     )
 
-    await AddStates.del_link.set()
+    await LinkStates.del_link.set()
 
 
 def main():
@@ -615,7 +622,7 @@ def main():
     2) обновление текущего расписания в БД для всех пользователей,
     3) отправка уведомлений о начале пары.
     """
-    tasks._main()
+    tasks.init_taskmanager()
 
     # Основной поток для бота
     executor.start_polling(dp, skip_updates=True)

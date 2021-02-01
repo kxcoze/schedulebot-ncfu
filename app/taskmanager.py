@@ -1,14 +1,13 @@
 import threading
 import json
 import asyncio
-from pprint import pprint
 from datetime import datetime, timedelta
 
 import schedule
 from aiogram import Bot
 
 import db
-import schedulecreator as SC
+from schedulecreator import update_schedule_user, _get_schedule_bell_ncfu
 from server import API_TOKEN
 
 
@@ -19,7 +18,7 @@ def update_schedules_users():
     data = db.fetchall('users', ('user_id', 'group_code', 'subgroup'))
     for user in data:
         try:
-            SC.update_schedule_user(
+            update_schedule_user(
                 user['user_id'], user['group_code'], user['subgroup'])
         except Exception as e:
             print(e)
@@ -40,7 +39,7 @@ def prepare_receivers(cur_lesson):
         5: 'Суббота',
     }
 
-    time_lesson_start = SC._get_schedule_bell_ncfu()[cur_lesson] \
+    time_lesson_start = _get_schedule_bell_ncfu()[cur_lesson] \
         .split(' - ')[0].split(':')
 
     cur_day = weekdays[cur_weekday]
@@ -77,7 +76,8 @@ def prepare_receivers(cur_lesson):
                 or searched_lesson == '':
             continue
         else:
-            sub_preference = json.loads(sub['preferences'])['notification_type']
+            sub_preference = json.loads(
+                sub['preferences'])['notification_type']
             audName = ''
             if searched_lesson['audName'] in 'ВКС/ЭТ':
                 if sub_preference == 'full-time':
@@ -150,7 +150,7 @@ def prepare_to_sending_notification(lesson_num):
 
 def schedule_for_tasks():
     # Присылать уведомления о начале пары
-    bell_schedule = SC._get_schedule_bell_ncfu()
+    bell_schedule = _get_schedule_bell_ncfu()
     for num, lesson in bell_schedule.items():
         if num.isdigit():
             time_lesson_start = lesson.split()[0].split(':')
@@ -168,10 +168,9 @@ def schedule_for_tasks():
 
     # Обновить коды университета
     schedule.every(4).weeks.do(db.insert_codes)
-    pprint(schedule.jobs)
 
 
-def _main():
+def init_taskmanager():
     loop = asyncio.new_event_loop()
     schedule_for_tasks()
     threading.Thread(
@@ -180,7 +179,3 @@ def _main():
             daemon=True,
     ).start()
     asyncio.run_coroutine_threadsafe(run_continuous(), loop)
-
-
-if __name__ == '__main__':
-    _main()

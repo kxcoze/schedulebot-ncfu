@@ -1,6 +1,6 @@
-import requests
-import time
 import os
+import time
+import requests
 import subprocess
 
 from bs4 import BeautifulSoup as BS4
