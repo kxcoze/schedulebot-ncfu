@@ -1,17 +1,20 @@
+import os
 import threading
 import json
 import asyncio
+import logging
 from datetime import datetime, timedelta
 
 import schedule
 from aiogram import Bot
+from aiogram.utils import exceptions
 
 import db
 from schedulecreator import update_schedule_user, _get_schedule_bell_ncfu
-from server import API_TOKEN
 
 
-bot = Bot(token=API_TOKEN)
+bot = Bot(token=os.getenv('API_TOKEN'))
+log = logging.getLogger('app_logger')
 
 
 def update_schedules_users():
@@ -20,9 +23,9 @@ def update_schedules_users():
         try:
             update_schedule_user(
                 user['user_id'], user['group_code'], user['subgroup'])
-        except Exception as e:
-            print(e)
-        # print("SUCCESS")
+            log.info(f"ID:{user['user_id']} schedule successful updated")
+        except:
+            log.exception(f"ID:{user['user_id']} failed to update schedule")
 
 
 def prepare_receivers(cur_lesson):
@@ -42,7 +45,7 @@ def prepare_receivers(cur_lesson):
     time_lesson_start = _get_schedule_bell_ncfu()[cur_lesson] \
         .split(' - ')[0].split(':')
 
-    cur_day = weekdays[cur_weekday]
+    cur_string_day = weekdays[cur_weekday]
     now = datetime.now()
     lesson_start = now.replace(
         hour=int(time_lesson_start[0]), minute=int(time_lesson_start[-1]))
@@ -64,26 +67,33 @@ def prepare_receivers(cur_lesson):
 
         searched_lesson = ''
         for day in schedulejs:
-            if day['weekday'] == cur_day:
+            lesson_day = int(day['date'].split(' ')[0])
+            cur_day = datetime.today().day
+            if day['weekday'] == cur_string_day and lesson_day == cur_day:
                 for lesson in day['lessons']:
                     if lesson['number'][0] == cur_lesson:
                         searched_lesson = lesson
                         break
 
-        if sub['subgroup'] != '0' and searched_lesson != '' \
-            and sub['subgroup'] not in searched_lesson['groupNumber'] \
-            and searched_lesson['groupNumber'] != '' \
-                or searched_lesson == '':
+        sub_preferences = json.loads(sub['preferences'])
+        if searched_lesson == '' or sub['subgroup'] != '0' and \
+                sub['subgroup'] not in searched_lesson['groupNumber'] and \
+                searched_lesson['groupNumber'] != '':
             continue
+
+        elif 'Иностранный язык в' in searched_lesson['lessonName'] and \
+                sub_preferences['foreign_lan'] not \
+                in searched_lesson['lessonName']:
+            continue
+
         else:
-            sub_preference = json.loads(
-                sub['preferences'])['notification_type']
+            sub_lesson_preference = sub_preferences['notification_type']
             audName = ''
             if searched_lesson['audName'] in 'ВКС/ЭТ':
-                if sub_preference == 'full-time':
+                if sub_lesson_preference == 'full-time':
                     continue
             else:
-                if sub_preference == 'distant':
+                if sub_lesson_preference == 'distant':
                     continue
                 audName = f"Аудитория: {searched_lesson['audName']}\n"
 
@@ -108,7 +118,15 @@ def prepare_receivers(cur_lesson):
             searched_link = ''
             for link in links:
                 # Может реализовать по совпадениям?
-                if link[0] == searched_lesson['lessonName'] or link[0] == searched_lesson['teacherName']:
+                link_data = link[0].lower()
+                lesson_name = searched_lesson['lessonName'].lower()
+                lesson_teacher = searched_lesson['teacherName'].lower()
+                initials = lesson_teacher.split(' ')
+                initials = ' '.join((
+                    initials[0], initials[1][0]+'.', initials[2][0]+'.')).lower()
+                if link_data == lesson_name or \
+                        link_data == lesson_teacher or \
+                        link_data == initials:
                     searched_link = f'\nСсылка на пару: {link[-1]}'
                     break
 
@@ -132,10 +150,43 @@ def start_background_eventloop(loop):
     loop.run_forever()
 
 
+async def send_message(user_id: int,
+                       text: str,
+                       disable_notification: bool = False) -> bool:
+    try:
+        await bot.send_message(
+            user_id, text, disable_notification=disable_notification)
+    except exceptions.BotBlocked:
+        log.error(f"Target [ID:{user_id}]: blocked by user")
+    except exceptions.ChatNotFound:
+        log.error(f"Target [ID:{user_id}]: invalid user ID")
+    except exceptions.RetryAfter as e:
+        log.error(
+            f"Target [ID:{user_id}]: Flood limit is exceeded."
+            "Sleep {e.timeout} seconds.")
+        await asyncio.sleep(e.timeout)
+        return await send_message(user_id, text)  # Recursive call
+    except exceptions.UserDeactivated:
+        log.error(f"Target [ID:{user_id}]: user is deactivated")
+    except exceptions.TelegramAPIError:
+        log.exception(f"Target [ID:{user_id}]: failed")
+    else:
+        log.info(f"Target [ID:{user_id}]: success")
+        return True
+    return False
+
+
 async def send_message_to_users(cur_lesson=1):
     receivers = prepare_receivers(cur_lesson)
-    for user in receivers:
-        await bot.send_message(user['user_id'], user['message'])
+    count = 0
+    try:
+        for user in receivers:
+            if await send_message(user['user_id'], user['message']):
+                count += 1
+            # 20 messages per second (Limit: 30 messages per second)
+            await asyncio.sleep(.05)
+    finally:
+        log.info(f"{count} messages successful sent.")
 
 
 async def run_continuous(interval=1):
@@ -148,7 +199,7 @@ def prepare_to_sending_notification(lesson_num):
     asyncio.create_task(send_message_to_users(lesson_num))
 
 
-def schedule_for_tasks():
+def planning_tasks():
     # Присылать уведомления о начале пары
     bell_schedule = _get_schedule_bell_ncfu()
     for num, lesson in bell_schedule.items():
@@ -167,12 +218,12 @@ def schedule_for_tasks():
     schedule.every().sunday.at("00:00:00").do(update_schedules_users)
 
     # Обновить коды университета
-    schedule.every(4).weeks.do(db.insert_codes)
+    schedule.every(10).weeks.do(db.insert_codes)
 
 
 def init_taskmanager():
     loop = asyncio.new_event_loop()
-    schedule_for_tasks()
+    planning_tasks()
     threading.Thread(
             target=start_background_eventloop, args=(loop,),
             name='schedule_thread',

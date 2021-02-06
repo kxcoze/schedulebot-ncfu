@@ -1,6 +1,8 @@
 import os
 import json
-import threading
+# import threading
+from sqlite3 import IntegrityError
+import logging
 
 import s3m
 
@@ -10,10 +12,11 @@ conn = s3m.connect(
     os.path.join(os.path.realpath('app'), 'db', 'users_codes.db'),
     isolation_level=None,
     check_same_thread=False,
+    single_cursor_mode=True,
 )
 
 cursor = conn.cursor()
-
+log = logging.getLogger('app_logger')
 
 # def lock_thread(main_thread=False):
 #     def decorator(func):
@@ -30,7 +33,7 @@ cursor = conn.cursor()
 #
 #         return wrapper
 #     return decorator
-#
+
 
 def get_cursor():
     return cursor
@@ -81,14 +84,14 @@ def insert_codes():
                     data_to_insert[3] = group['groupCode'].lower()
                     # Возможно стоит отправлять результаты вставки в логи?
                     try:
-                        print("NEW DATA -> ", data_to_insert)
                         cursor.execute(
                             "INSERT INTO univer_code VALUES (?,?,?,?)",
                             tuple(data_to_insert),
                         )
                         conn.commit()
-                    except:
-                        print("ALREADY HAS -> ", data_to_insert)
+                        log.info(f"NEW DATA -> {data_to_insert}")
+                    except IntegrityError:
+                        log.warning(f"ALREADY HAS -> {data_to_insert}")
 
 
 def insert(table, *args):
@@ -103,7 +106,9 @@ def insert_new_user(
         notifications=0,
         schedule_cur_week='', schedule_next_week='',
         links='[]',
-        references={'pref_time': 5, 'notification_type': 'distant'}):
+        references={'pref_time': 5,
+                    'notification_type': 'distant',
+                    'foreign_lan': ''}):
     insert(
         'users',
         user_id, group_code, group_subnum,
@@ -119,6 +124,7 @@ def check_user(user_id, **kwargs):
     result = cursor.fetchone()
     if result is None:
         insert_new_user(user_id, **kwargs)
+        log.info(f'ID:[{user_id}] successful added in db->users')
     else:
         pass
 

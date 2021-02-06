@@ -10,8 +10,16 @@ def show_optional_ikeyboard():
     text = (
         'Для изменения времени оповещения нажмите кнопку \n'
         '<em><b>Время уведомления</b></em>\n\n'
-        'Для выбора типа пар, на которые будут приходить уведомления'
-        'нажмите кнопку \n<em><b>Тип пар</b></em>'
+
+        'Для выбора типа пар, на которые будут приходить уведомления '
+        'нажмите кнопку \n<em><b>Тип пар</b></em>\n\n'
+
+        'Для изменения номера подгруппы нажмите кнопку \n'
+        '<em><b>Подгруппа</b></em>\n\n'
+
+        'Для изменения иностранного языка, который будет учитываться '
+        'при показе расписания или уведомления, нажмите кнопку \n'
+        '<em><b>Иностранный язык</b></em>'
     )
     markup = types.InlineKeyboardMarkup()
 
@@ -23,6 +31,16 @@ def show_optional_ikeyboard():
             types.InlineKeyboardButton(
                 'Тип пар',
                 callback_data=cbd_poll.new(id='2')),
+    )
+
+    markup.add(
+            types.InlineKeyboardButton(
+                'Подгруппа',
+                callback_data=cbd_poll.new(id='3')),
+
+            types.InlineKeyboardButton(
+                'Иностранный язык',
+                callback_data=cbd_poll.new(id='4')),
     )
 
     return text, markup

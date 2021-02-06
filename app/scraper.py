@@ -2,6 +2,7 @@ import os
 import time
 import requests
 import subprocess
+import logging
 
 from bs4 import BeautifulSoup as BS4
 from selenium import webdriver
@@ -9,7 +10,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+
 CHROMEDRIVER_PATH = os.getenv('CHROMEDRIVER_PATH')
+log = logging.getLogger('app_logger')
 
 
 class SelScrapingSchedule:
@@ -21,8 +24,7 @@ class SelScrapingSchedule:
 
         # Выход из браузера в случае рестарта скрипта
         browser.quit()
-        print("Restarting script...")
-        # self.get_html_from_schedul()
+        log.warning("Restarting script...")
         return
 
     def check_connection(self):
@@ -31,11 +33,11 @@ class SelScrapingSchedule:
         # Данная функция проверяет наличие интернета, а не скорость соединения,
         # поэтому необходимо переделать в скором времени.
         try:
-            subprocess.check_call(["ping", "-c 1", "www.google.com"])
-            print("Connection is good.\n")
+            subprocess.check_call(["ping", "-c 1", "www.google.ru"])
+            log.warning("Connection is good.")
             return True
         except subprocess.CalledProcessError:
-            print("Connection is broken.\n")
+            log.warning("Connection is broken.")
             return False
 
     def get_html_from_schedule(self):
@@ -53,18 +55,29 @@ class SelScrapingSchedule:
             self.restart_script(browser)
             return
         # XPATH = /div[@class='panel-collapse collapse in']/div[@class='panel-body']/div[@class='panel-group specialities']/div[@class='panel panel-default']
-        XPATH_to_institutes = "//div[@id='page']/div[@id='select-group']/div[@class='col-lg-7 col-md-6']/div[@id='institutes']/div[@class='panel panel-default']"
+        XPATH_to_institutes = (
+            "//div[@id='page']/div[@id='select-group']"
+            "/div[@class='col-lg-7 col-md-6']"
+            "/div[@id='institutes']"
+            "/div[@class='panel panel-default']"
+        )
 
-        XPATH_to_specialities = XPATH_to_institutes + "/div[@class='panel-collapse collapse in']/div[@class='panel-body']/div[@class='panel-group specialities']/div[@class='panel panel-default']"
+        XPATH_to_specialities = ''.join(tuple(
+            XPATH_to_institutes,
+            ("/div[@class='panel-collapse collapse in']"
+             "/div[@class='panel-body']"
+             "/div[@class='panel-group specialities']"
+             "/div[@class='panel panel-default']")))
 
         # XPATH_to_groups = XPATH_to_specialities + "/div[@class='panel-collapse collapse in']/div[@class='panel-body']/ul[@class='list-group']/li[@class='list-group-item']"
         try:
             institutes = WebDriverWait(browser, 30).until(
-                    EC.presence_of_all_elements_located((By.XPATH, XPATH_to_institutes))
+                    EC.presence_of_all_elements_located((
+                        By.XPATH, XPATH_to_institutes))
             )
         except:
-            print("Warning! Cannot load list of institutes!\n"
-                  "Please reload the script!")
+            log.error("Cannot load list of institutes!\n"
+                      "Please reload the script!")
             self.restart_script(browser)
         finally:
             wait = WebDriverWait(browser, 10)
@@ -96,14 +109,14 @@ class SelScrapingSchedule:
                             )
                             """
                         except:
-                            print("Warning! Cannot load list of groups!")
+                            log.warning("Cannot load list of groups!")
                             # Если беда с подключением перезапускаем скрипт, иначе продолжаем
                             if not self.check_connection():
                                 self.restart_script(browser)
                                 return
 
                 except:
-                    print("Warning! Cannot load list of specialities!")
+                    log.warning("Cannot load list of specialities!")
                     # Если беда с подключением перезапускаем скрипт, иначе продолжаем
                     if not self.check_connection():
                         self.restart_script(browser)
@@ -200,8 +213,8 @@ class SelParser:
             elements[index_to_click].click()
             time.sleep(1)
             next_week_html = browser.page_source
-        except Exception as e:
-            print(e)
+        except:
+            log.exception('Something went wrong in headless browser!')
         finally:
             browser.quit()
 

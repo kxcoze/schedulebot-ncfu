@@ -1,9 +1,13 @@
 import json
+import logging
 from typing import List
 from datetime import datetime
+from sqlite3 import IntegrityError
 
 import db
 from scraper import SelParser, Parser
+
+log = logging.getLogger('app_logger')
 
 
 def get_json_schedule(code_group):
@@ -44,7 +48,8 @@ def update_schedule_user(user_id, group_code, group_subnum):
                 schedule_cur_week=schedule_weeks[0],
                 schedule_next_week=schedule_weeks[1],
         )
-    except:
+        log.info(f'ID:[{user_id}] schedule successful added in db->users')
+    except IntegrityError:
         db.update(
                 'users',
                 (('group_code', group_code),
@@ -53,11 +58,18 @@ def update_schedule_user(user_id, group_code, group_subnum):
                  ('schedule_next_week', schedule_weeks[1])),
                 'user_id', user_id,
         )
+        log.warning(f'ID:[{user_id}] schedule successful updated db->users')
 
 
 def get_formatted_schedule(user_id, range, requested_week='cur'):
-    schedulejs = json.loads(
-           db.get('users', f'schedule_{requested_week}_week', 'user_id', user_id))
+    data_dict = db.fetchall(
+        'users',
+        (f'schedule_{requested_week}_week', 'subgroup', 'preferences'),
+        f"WHERE user_id={user_id}"
+    )[0]
+    schedulejs = json.loads(data_dict[f'schedule_{requested_week}_week'])
+    user_subgroup = data_dict['subgroup']
+    user_foreign_lang = json.loads(data_dict['preferences'])['foreign_lan']
 
     today = datetime.today().isoweekday()-1
     tom = 0 if today + 1 > 6 else today + 1
@@ -87,16 +99,14 @@ def get_formatted_schedule(user_id, range, requested_week='cur'):
         weekday = 'завтра'
     else:
         week_to_work = '' if requested_week == 'cur' else 'следующий'
-        weekday = ' '.join(_format_rus_words([week_to_work, date_to_operate.lower()])).strip()
+        weekday = ' '.join(_format_rus_words(
+            [week_to_work, date_to_operate.lower()])).strip()
         if date_to_operate == 'Воскресенье':
             return (f"<b><em>Вы запросили расписание на {weekday}, "
                     "может быть стоит отдохнуть?</em></b>")
 
     if range != 'week':
         schedulejs = [x for x in schedulejs if x['weekday'] == date_to_operate]
-
-    user_subgroup = db.get(
-        'users', 'subgroup', 'user_id', user_id)
 
     if not len(schedulejs) > 0:
         return f"<b><em>На {weekday} доступного расписания нет!</em></b>"
@@ -106,7 +116,12 @@ def get_formatted_schedule(user_id, range, requested_week='cur'):
         formatted_schedule += f"\n<b>{day['weekday']}, {day['date']}</b>\n"
 
         for lesson in day['lessons']:
-            if user_subgroup != '0' and user_subgroup not in lesson['groupNumber'] and lesson['groupNumber'] != '':
+            if user_subgroup != '0' and \
+                    user_subgroup not in lesson['groupNumber'] and \
+                    lesson['groupNumber'] != '':
+                continue
+            elif 'Иностранный язык в' in lesson['lessonName'] and \
+                    user_foreign_lang not in lesson['lessonName']:
                 continue
             numb_para, time_para = lesson['number'].split(', ')
 
