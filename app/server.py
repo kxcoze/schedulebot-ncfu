@@ -716,6 +716,7 @@ def main():
     tasks.init_taskmanager()
 
     # Основной поток для бота
+    # executor.start_polling(dp, skip_updates=True, on_startup=db.insert_codes())
     executor.start_polling(dp, skip_updates=True)
 
 

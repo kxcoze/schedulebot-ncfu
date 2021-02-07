@@ -1,6 +1,5 @@
 import os
 import json
-# import threading
 from sqlite3 import IntegrityError
 import logging
 
@@ -17,22 +16,6 @@ conn = s3m.connect(
 
 cursor = conn.cursor()
 log = logging.getLogger('app_logger')
-
-# def lock_thread(main_thread=False):
-#     def decorator(func):
-#         lock = threading.Lock()
-#
-#         def wrapper(*args, **kwargs):
-#             if main_thread or threading.current_thread() is not threading.main_thread():
-#                 lock.acquire(True)
-#             return_value = func(*args, **kwargs)
-#             try:
-#                 lock.release()
-#             finally:
-#                 return return_value
-#
-#         return wrapper
-#     return decorator
 
 
 def get_cursor():

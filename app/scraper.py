@@ -9,7 +9,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
+from selenium.webdriver.common.action_chains import ActionChains
 
 CHROMEDRIVER_PATH = os.getenv('CHROMEDRIVER_PATH')
 log = logging.getLogger('app_logger')
@@ -44,8 +44,9 @@ class SelScrapingSchedule:
         """Прокликиваем все доступные институты и специальности
            ради получения ссылок на группы, возвращаем html-документ
            страницы в переменную класса html"""
+        url = 'https://ecampus.ncfu.ru/schedule'
+        log.info(f'Initialize getting all specialities from {url}')
         try:
-            url = 'https://ecampus.ncfu.ru/schedule'
             options = webdriver.ChromeOptions()
             options.add_argument('--headless')
             browser = webdriver.Chrome(
@@ -54,7 +55,7 @@ class SelScrapingSchedule:
         except:
             self.restart_script(browser)
             return
-        # XPATH = /div[@class='panel-collapse collapse in']/div[@class='panel-body']/div[@class='panel-group specialities']/div[@class='panel panel-default']
+
         XPATH_to_institutes = (
             "//div[@id='page']/div[@id='select-group']"
             "/div[@class='col-lg-7 col-md-6']"
@@ -62,24 +63,23 @@ class SelScrapingSchedule:
             "/div[@class='panel panel-default']"
         )
 
-        XPATH_to_specialities = ''.join(tuple(
+        XPATH_to_specialities = ''.join((
             XPATH_to_institutes,
             ("/div[@class='panel-collapse collapse in']"
              "/div[@class='panel-body']"
              "/div[@class='panel-group specialities']"
              "/div[@class='panel panel-default']")))
 
-        # XPATH_to_groups = XPATH_to_specialities + "/div[@class='panel-collapse collapse in']/div[@class='panel-body']/ul[@class='list-group']/li[@class='list-group-item']"
         try:
             institutes = WebDriverWait(browser, 30).until(
                     EC.presence_of_all_elements_located((
                         By.XPATH, XPATH_to_institutes))
             )
         except:
-            log.error("Cannot load list of institutes!\n"
-                      "Please reload the script!")
+            log.exception("Cannot load list of institutes!\n"
+                          "Please reload the script!")
             self.restart_script(browser)
-        finally:
+        else:
             wait = WebDriverWait(browser, 10)
             for item in institutes:
                 try:
@@ -88,7 +88,20 @@ class SelScrapingSchedule:
                                 By.XPATH,
                                 XPATH_to_institutes))
                     )
-                    item.click()
+                    browser.execute_script(
+                        'arguments[0].scrollIntoView('
+                        '{behavior: "smooth", '
+                        'block: "center",'
+                        'inline: "nearest"})', item)
+                    time.sleep(1)
+                    ActionChains(browser).move_to_element(item).click(on_element=item).perform()
+                    time.sleep(1)
+                    browser.execute_script(
+                        'arguments[0].scrollIntoView('
+                        '{behavior: "smooth", '
+                        'block: "center",'
+                        'inline: "nearest"})', item)
+                    log.info(f'Successful clicked on this: {item}')
                     specialities = wait.until(
                                 EC.presence_of_all_elements_located((
                                     By.XPATH,
@@ -101,30 +114,39 @@ class SelScrapingSchedule:
                                         By.XPATH,
                                         XPATH_to_specialities))
                             )
-                            speciality.click()
-                            """
-                            Просто клики, без проверки наличия групп
-                            groups = wait.until(
-                                    EC.presence_of_all_elements_located((By.XPATH, XPATH_to_groups))
-                            )
-                            """
+
+                            browser.execute_script(
+                                'arguments[0].scrollIntoView('
+                                '{behavior: "smooth", '
+                                'block: "center",'
+                                'inline: "nearest"})', speciality)
+                            time.sleep(1)
+                            ActionChains(browser).move_to_element(speciality).click(on_element=speciality).perform()
+                            time.sleep(1)
+                            browser.execute_script(
+                                'arguments[0].scrollIntoView('
+                                '{behavior: "smooth", '
+                                'block: "center",'
+                                'inline: "nearest"})', speciality)
+                            log.info(f'Successful clicked on this: {speciality}')
                         except:
-                            log.warning("Cannot load list of groups!")
+                            log.exception("Cannot load list of groups!")
                             # Если беда с подключением перезапускаем скрипт, иначе продолжаем
                             if not self.check_connection():
                                 self.restart_script(browser)
                                 return
 
                 except:
-                    log.warning("Cannot load list of specialities!")
+                    log.exception("Cannot load list of specialities!")
                     # Если беда с подключением перезапускаем скрипт, иначе продолжаем
                     if not self.check_connection():
                         self.restart_script(browser)
                         return
 
-        self.html = browser.page_source
-        time.sleep(5)
-        browser.quit()
+            self.html = browser.page_source
+            time.sleep(5)
+        finally:
+            browser.quit()
 
 
 class ParserSchedule:

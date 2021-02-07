@@ -29,9 +29,10 @@ def update_schedules_users():
 
 
 def prepare_receivers(cur_lesson):
+    receivers = []
     cur_weekday = datetime.today().weekday()
     if cur_weekday == 6:
-        return
+        return receivers
 
     weekdays = {
         0: 'Понедельник',
@@ -60,7 +61,6 @@ def prepare_receivers(cur_lesson):
         if user['notifications'] == 1 and pref_time == verification_time:
             subscribers.append(user)
 
-    receivers = []
     for sub in subscribers:
         schedulejs = json.loads(
             db.get('users', 'schedule_cur_week', 'user_id', sub['user_id']))
