@@ -179,14 +179,17 @@ async def send_message(user_id: int,
 async def send_message_to_users(cur_lesson=1):
     receivers = prepare_receivers(cur_lesson)
     count = 0
-    try:
-        for user in receivers:
-            if await send_message(user['user_id'], user['message']):
-                count += 1
-            # 20 messages per second (Limit: 30 messages per second)
-            await asyncio.sleep(.05)
-    finally:
-        log.info(f"{count} messages successful sent.")
+    if receivers:
+        try:
+            for user in receivers:
+                if await send_message(user['user_id'], user['message']):
+                    count += 1
+                # 20 messages per second (Limit: 30 messages per second)
+                await asyncio.sleep(.05)
+        finally:
+            log.info(f"{count} messages successful sent.")
+    else:
+        log.info('No users to send message.')
 
 
 async def run_continuous(interval=1):

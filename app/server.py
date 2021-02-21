@@ -53,7 +53,6 @@ class LinkStates(StatesGroup):
 async def initializebot(message: types.Message):
     """Добавить клавиатуру"""
     """Приветствие от бота по команде /start"""
-    """Возможно здесь стоит добавить юзера в базу данных"""
     await message.answer(
             "Привет! \n"
             "Я бот для расписаний СКФУ! \n"
@@ -155,7 +154,6 @@ async def set_user_group(message: types.Message):
 @dp.message_handler(state=MainStates.waiting_for_group_name)
 async def wait_for_group_name(message: types.Message, state: FSMContext):
     msg = message.text.split('\n')
-    print(msg)
     # Регулярное выражение для поиска группы
     regroup = re.compile(
         '(([а-яА-я]-[а-яА-Я]{3}|[а-яА-Я]{3})-[а-я]+?-[а-я]+?-\\d{1,3}'
@@ -290,9 +288,9 @@ async def wait_user_time_preferences(query: types.CallbackQuery, state: FSMConte
         "(от 0 до 60 минут)\n"
     )
     await bot.send_message(
-            text=answer,
-            chat_id=query.message.chat.id,
-            parse_mode='HTML',
+        text=answer,
+        chat_id=query.message.chat.id,
+        parse_mode='HTML',
     )
 
     await MainStates.add_time_preference.set()
@@ -326,11 +324,11 @@ async def wait_user_type_preferences(query: types.CallbackQuery):
     await query.answer()
     text, markup = ik.show_type_preference_ikeyboard()
     await bot.edit_message_text(
-            text=text,
-            chat_id=query.message.chat.id,
-            message_id=query.message.message_id,
-            reply_markup=markup,
-            parse_mode='HTML',
+        text=text,
+        chat_id=query.message.chat.id,
+        message_id=query.message.message_id,
+        reply_markup=markup,
+        parse_mode='HTML',
     )
 
 
@@ -357,9 +355,9 @@ async def wait_user_subgroup_preferences(query: types.CallbackQuery, state: FSMC
         "Укажите Вашу подгруппу от (0 до 9)\n"
     )
     await bot.send_message(
-            text=answer,
-            chat_id=query.message.chat.id,
-            parse_mode='HTML',
+        text=answer,
+        chat_id=query.message.chat.id,
+        parse_mode='HTML',
     )
 
     await MainStates.add_subgroup_preference.set()
@@ -395,9 +393,9 @@ async def wait_user_language_preferences(query: types.CallbackQuery, state: FSMC
         '<em>Английский</em> или <em>Русский</em>'
     )
     await bot.send_message(
-            text=answer,
-            chat_id=query.message.chat.id,
-            parse_mode='HTML',
+        text=answer,
+        chat_id=query.message.chat.id,
+        parse_mode='HTML',
     )
 
     await MainStates.add_language_preference.set()
@@ -430,9 +428,9 @@ async def links_show_interface(message: types.Message, state: FSMContext):
     db.check_user(message.chat.id)
     text, markup = lm.show_page(message.chat.id)
     await message.answer(
-            text=text,
-            reply_markup=markup,
-            parse_mode='HTML',
+        text=text,
+        reply_markup=markup,
+        parse_mode='HTML',
     )
 
 
@@ -444,9 +442,9 @@ async def query_show_prev_next_page(query: types.CallbackQuery,
     cur_page = int(callback_data['page_num'])
     text, markup = lm.show_page(query.message.chat.id, cur_page)
     await query.message.edit_text(
-            text=text,
-            reply_markup=markup,
-            parse_mode='HTML',
+        text=text,
+        reply_markup=markup,
+        parse_mode='HTML',
     )
 
 
@@ -501,9 +499,9 @@ async def query_edit_info(query: types.CallbackQuery,
                            "/измененную ссылку!")
         text, markup = lm.show_page(query.message.chat.id, cur_page)
         await query.message.edit_text(
-                text=text,
-                reply_markup=markup,
-                parse_mode='HTML',
+            text=text,
+            reply_markup=markup,
+            parse_mode='HTML',
         )
         return
 

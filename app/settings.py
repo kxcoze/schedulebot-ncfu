@@ -4,22 +4,28 @@ logging_dict = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
-        'std_format': {
-            'format': '{asctime} - {levelname} - {name} - {module}:{funcName}:{lineno} - {message}',
+        'file_formatter': {
+            'format': '{asctime} — {levelname} — {name} — {module}:{funcName}:{lineno} — {message}',
+            'datefmt': '[%d/%m/%Y] — %H:%M:%S',
+            'style': '{',
+        },
+        'console_formatter': {
+            'format': '{asctime} — {levelname} — {name} — {message}',
+            'datefmt': '[%d/%m/%Y] — %H:%M',
             'style': '{',
         }
     },
     'handlers': {
         'console': {
-            'level': 'INFO',
+            'level': 'WARNING',
             'class': 'logging.StreamHandler',
-            'formatter': 'std_format',
+            'formatter': 'console_formatter',
         },
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
             'filename': 'server.log',
-            'formatter': 'std_format',
+            'formatter': 'file_formatter',
         }
     },
     'loggers': {
@@ -28,7 +34,6 @@ logging_dict = {
             'handlers': ['console', 'file'],
             'propagate': False,
         }
-
     },
     'root': {
         'level': 'INFO',
