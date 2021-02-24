@@ -13,4 +13,4 @@ _TODO:_
 6. [ ] Осуществить выгрузку посредством Docker на какой-нибудь VDS (например HostVDS)
 
 
-[inline URL](http://www.google.ru)
+[link](http://www.google.ru)
