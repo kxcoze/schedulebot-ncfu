@@ -72,6 +72,7 @@ async def send_help_commands(message: types.Message, state: FSMContext):
             "<em>Команды для настройки бота:</em> \n"
             "/setgroup - Ввод группы для показа расписания \n"
             "/links - Интерфейс для работы со ссылками \n"
+            "/homework - Интерфейс для записи домашних заданий \n"
             "/notifyme - Подписаться на уведомления о начале пары \n"
             "/stopnotifyme - Отписаться от уведомлений \n"
             "/setpreferences - Настройка предпочтений по уведомлениям \n\n"
@@ -675,33 +676,33 @@ async def process_link(message: types.Message, state: FSMContext):
             )
 
 
-@dp.callback_query_handler(lm.list.filter(action='del'))
-async def query_delete_link_by_num(
-        query: types.CallbackQuery,
-        callback_data: typing.Dict[str, str],
-        state: FSMContext):
-
-    await query.answer('Для удаления ссылки из списка напишите его номер')
-
-    if len(lm.get_links(query.message.chat.id)) == 0:
-        await bot.send_message(
-            text="Ваш список ссылок пуст!",
-            chat_id=query.message.chat.id,
-            parse_mode='HTML',
-        )
-        return await state.finish()
-
-    async with state.proxy() as data:
-        data['main'] = query.message.message_id
-        data['page_num'] = int(callback_data['page_num'])
-
-    await bot.send_message(
-        text='Для удаления ссылки из списка напишите его номер',
-        chat_id=query.message.chat.id,
-        parse_mode='HTML',
-    )
-
-    await LinkStates.del_link.set()
+# @dp.callback_query_handler(lm.list.filter(action='del'))
+# async def query_delete_link_by_num(
+#         query: types.CallbackQuery,
+#         callback_data: typing.Dict[str, str],
+#         state: FSMContext):
+#
+#     await query.answer('Для удаления ссылки из списка напишите его номер')
+#
+#     if len(lm.get_links(query.message.chat.id)) == 0:
+#         await bot.send_message(
+#             text="Ваш список ссылок пуст!",
+#             chat_id=query.message.chat.id,
+#             parse_mode='HTML',
+#         )
+#         return await state.finish()
+#
+#     async with state.proxy() as data:
+#         data['main'] = query.message.message_id
+#         data['page_num'] = int(callback_data['page_num'])
+#
+#     await bot.send_message(
+#         text='Для удаления ссылки из списка напишите его номер',
+#         chat_id=query.message.chat.id,
+#         parse_mode='HTML',
+#     )
+#
+#     await LinkStates.del_link.set()
 
 
 def main():

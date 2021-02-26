@@ -176,7 +176,7 @@ def update_link_url(user_id: str, num: int, new_url: str):
 
 def delete_link_by_num(user_id: str, ind: int) -> int:
     user_links = get_links(user_id)
-    if 0 <= ind <= len(user_links)-1:
+    if 0 <= ind < len(user_links):
         del user_links[ind]
         _update_db_link(user_id, user_links)
         return 0
