@@ -16,8 +16,8 @@ from aiogram.utils.exceptions import MessageNotModified
 import db
 import schedulecreator as SC
 import taskmanager as tasks
-import linkmanager as lm
 import inlinekeyboard as ik
+from bookclasses import Book, Links, Homework
 from settings import logging_dict
 
 API_TOKEN = os.getenv('API_TOKEN')
@@ -43,10 +43,18 @@ class MainStates(StatesGroup):
     add_language_preference = State()
 
 
-class LinkStates(StatesGroup):
-    input_link = State()
-    edit_link = State()
-    del_link = State()
+class LinksStates(StatesGroup):
+    input_data = State()
+    edit_data = State()
+    del_data = State()
+
+
+class HomeworkStates(StatesGroup):
+    input_data = State()
+    input_homework = State()
+    edit_data = State()
+    edit_homework = State()
+    del_data = State()
 
 
 @dp.message_handler(commands=['start'])
@@ -427,55 +435,68 @@ async def links_show_interface(message: types.Message, state: FSMContext):
     await state.finish()
     # Добавить обработку отсутствия пользователя в БД
     db.check_user(message.chat.id)
-    text, markup = lm.show_page(message.chat.id)
+    user_book = Links(message.chat.id)
+    text, markup = user_book.show_page()
     await message.answer(
         text=text,
         reply_markup=markup,
-        parse_mode='HTML',
     )
 
 
-@dp.callback_query_handler(lm.list.filter(action=['main', 'prev', 'next']),
+@dp.message_handler(commands=['homework'], state='*')
+async def homework_show_interface(message: types.Message, state: FSMContext):
+    await state.finish()
+    # Добавить обработку отсутствия пользователя в БД
+    db.check_user(message.chat.id)
+    user_book = Homework(message.chat.id)
+    text, markup = user_book.show_page()
+    await message.answer(
+        text=text,
+        reply_markup=markup,
+    )
+
+
+@dp.callback_query_handler(Book.list.filter(action=['main', 'prev', 'next']),
                            state='*')
-async def query_show_prev_next_page(query: types.CallbackQuery,
+async def query_show_homework_prev_next_page(query: types.CallbackQuery,
                                     callback_data: typing.Dict[str, str]):
     await query.answer()
     cur_page = int(callback_data['page_num'])
-    text, markup = lm.show_page(query.message.chat.id, cur_page)
+    if callback_data['name'] == 'homework':
+        user_book = Homework(query.message.chat.id)
+    else:
+        user_book = Links(query.message.chat.id)
+    text, markup = user_book.show_page(cur_page)
     await query.message.edit_text(
         text=text,
         reply_markup=markup,
-        parse_mode='HTML',
     )
 
 
-@dp.callback_query_handler(lm.list.filter(action='view'), state='*')
+@dp.callback_query_handler(Book.list.filter(action='view', name='links'), state='*')
 async def query_show_link_info(query: types.CallbackQuery,
                                callback_data: typing.Dict[str, str]):
     cur_page = int(callback_data['page_num'])
     ind = int(callback_data['id']) - 1
+    user_book = Links(query.message.chat.id)
+    data_element = user_book.parse_msg(query.message.text)[ind % user_book.WIDTH][1:]
+    new_ind = user_book.check_existing_data(data_element, ind)
 
-    regex = ".(.?)\n\\D+: (.*)\n\\D+: (.*)"
-    message_text = query.message.text
-    data = re.findall(regex, message_text)
-    link = data[ind % lm.WIDTH][1:]
-
-    new_ind = lm.check_existing_link(query.message.chat.id, link, ind)
     if new_ind == -1:
         await query.answer('Такого номера не существует!')
-        text, markup = lm.show_page(query.message.chat.id, cur_page)
+        text, markup = user_book.show_page(cur_page)
         await query.message.edit_text(
             text=text,
             reply_markup=markup,
-            parse_mode='HTML')
+        )
         return
     elif new_ind != ind:
         ind = new_ind
-        cur_page = ind // lm.WIDTH
+        cur_page = ind // user_book.WIDTH
 
     try:
+        text, markup = user_book.view_data_element(cur_page, ind)
         await query.answer()
-        text, markup = lm.view_link_data(query.message.chat.id, cur_page, ind)
         await query.message.edit_text(text, reply_markup=markup)
     except:
         log.exception('Something went wrong with showing link'
@@ -483,132 +504,111 @@ async def query_show_link_info(query: types.CallbackQuery,
         await query.answer('Произошла непредвиденная ошибка.')
 
 
-@dp.callback_query_handler(lm.list.filter(action=['edit']), state='*')
-async def query_edit_info(query: types.CallbackQuery,
-                          callback_data: typing.Dict[str, str],
-                          state: FSMContext):
-    text = query.message.text
-    regex = re.compile(".(.?)\n\\D+: (.*)\n\\D+: (.*)")
-    data = regex.search(text).groups()
-    ind = int(data[0])-1
-    link = data[1:]
-
+@dp.callback_query_handler(Book.list.filter(action='view', name='homework'), state='*')
+async def query_show_homework_info(query: types.CallbackQuery,
+                               callback_data: typing.Dict[str, str]):
     cur_page = int(callback_data['page_num'])
-    ind = lm.check_existing_link(query.message.chat.id, link, ind)
-    if ind == -1:
-        await query.answer("Вы пытаетесь изменить несуществующую"
-                           "/измененную ссылку!")
-        text, markup = lm.show_page(query.message.chat.id, cur_page)
+    ind = int(callback_data['id']) - 1
+    user_book = Homework(query.message.chat.id)
+    data_element = user_book.parse_msg(query.message.text)
+    try:
+        data_element = data_element[ind % user_book.WIDTH][1:]
+    except IndexError:
+        data_element = data_element[0][1:]
+    finally:
+        new_ind = user_book.check_existing_data(data_element, ind)
+
+    if new_ind == -1:
+        await query.answer('Такого номера не существует!')
+        text, markup = user_book.show_page(cur_page)
         await query.message.edit_text(
             text=text,
             reply_markup=markup,
-            parse_mode='HTML',
         )
         return
+    elif new_ind != ind:
+        ind = new_ind
+        cur_page = ind // user_book.WIDTH
 
-    variant = callback_data['id']
-    answer = 'Введите '
-    if variant == '1':
-        additional = 'новый предмет/преподавателя'
-    elif variant == '2':
-        additional = 'новую ссылку'
-    else:
-        additional = 'новую информацию'
-    answer += additional
-    await query.answer(answer)
-
-    async with state.proxy() as data:
-        data['main'] = query.message.message_id
-        data['page_num'] = cur_page
-        data['var'] = variant
-        data['ind'] = int(ind)
-
-    await bot.send_message(
-            text=answer,
-            chat_id=query.message.chat.id,
-            parse_mode='HTML',
-    )
-    await LinkStates.edit_link.set()
-
-
-@dp.message_handler(state=LinkStates.edit_link)
-async def state_edit_link(message: types.Message, state: FSMContext):
-    message_text = message.text.split('\n')[0]
-    async with state.proxy() as data:
-        cur_page = data['page_num']
-        ind = data['ind']
-        variant = data['var']
-        if variant == '1':
-            lm.update_link_lesson(message.chat.id, ind, message_text)
-        elif variant == '2':
-            lm.update_link_url(message.chat.id, ind, message_text)
-
-        text, markup = lm.view_link_data(message.chat.id, cur_page, ind)
-        try:
-            await bot.edit_message_text(
-                text=text,
-                chat_id=message.chat.id,
-                message_id=data['main'],
-                reply_markup=markup,
-                parse_mode='HTML',
-            )
-        except MessageNotModified:
-            # Информация в ссылке не изменилась
-            pass
-        await state.finish()
-
-
-@dp.callback_query_handler(lm.list.filter(action='delete_link'), state='*')
-async def query_delete_link(query: types.CallbackQuery,
-                            callback_data: typing.Dict[str, str],
-                            state: FSMContext):
-    await state.finish()
-    text = query.message.text
-    regex = re.compile(".(.?)\n\\D+: (.*)\n\\D+: (.*)")
-    data = regex.search(text).groups()
-    ind = int(data[0])-1
-    link = data[1:]
     try:
-        result = lm.delete_link_by_info(query.message.chat.id, link, ind)
-        if result == 0:
-            await query.answer('Ссылка успешно удалена!')
-        elif result == -1:
-            await query.answer('Ссылка отсутствует.')
+        text, markup = user_book.view_data_element(cur_page, ind)
+        await query.answer()
+        await query.message.edit_text(text, reply_markup=markup)
     except:
-        log.exception('Something went wrong with deleting link'
+        log.exception('Something went wrong with showing link'
                       f'user ID:[{query.message.chat.id}]')
         await query.answer('Произошла непредвиденная ошибка.')
 
-    cur_page = int(callback_data['page_num'])
-    text, markup = lm.show_page(query.message.chat.id, cur_page)
-    await query.message.edit_text(
-        text=text,
-        reply_markup=markup,
-        parse_mode='HTML',
-    )
 
 
-# Возможно стоит добавить ограничитель нажатий
-@dp.callback_query_handler(lm.list.filter(action='add'))
-async def query_add_link(query: types.CallbackQuery,
+@dp.callback_query_handler(Book.list.filter(action='view2', name='homework'), state='*')
+async def query_show_homework_detail_info(query: types.CallbackQuery,
+                               callback_data: typing.Dict[str, str]):
+    ind_sub = int(callback_data['page_num'])
+    ind_hmw = int(callback_data['id']) - 1
+    user_book = Homework(query.message.chat.id)
+    page_data = user_book.parse_msg(query.message.text)[0][1:]
+    new_ind = user_book.check_existing_data(page_data, ind_sub)
+    if new_ind == -1:
+        await query.answer('Такого номера не существует!')
+        text, markup = user_book.show_page()
+        await query.message.edit_text(
+            text=text,
+            reply_markup=markup,
+        )
+        return
+
+    ind_sub = new_ind
+    cur_page = ind_sub // user_book.WIDTH
+    user_pages = user_book.pages[ind_sub][1]
+    if len(user_pages)-1 < ind_hmw or user_pages[ind_hmw] != page_data[1][ind_hmw]:
+        ind_hmw = user_pages.index(page_data[1][ind_hmw])
+    try:
+        text, markup = user_book.view2_data_element(ind_sub, ind_hmw)
+        await query.answer()
+        await query.message.edit_text(text, reply_markup=markup)
+    except:
+        log.exception('Something went wrong with showing link'
+                      f'user ID:[{query.message.chat.id}]')
+        await query.answer('Произошла непредвиденная ошибка.')
+
+
+@dp.callback_query_handler(Book.list.filter(action='add'))
+async def query_add_data(query: types.CallbackQuery,
                          callback_data: typing.Dict[str, str],
                          state: FSMContext):
     await query.answer()
-    answer = ("Для добавления ссылки на пару, укажите "
-              "преподавателя/предмет (в точности как в расписании), "
-              "который желаете добавить и на следующей строке "
-              "ссылку на занятие (BBB, zoom и т.п.)\n"
-              "Например: \n"
-              "<b>Иностранный язык в профессиональной сфере "
-              "(английский язык)\n"
-              "'Ссылка на занятие'</b>\n"
-              "или\n"
-              "<b>Иванов Иван Иванович\n"
-              "'Cсылка на занятие'</b>")
 
     async with state.proxy() as data:
         data['main'] = query.message.message_id
         data['page_num'] = int(callback_data['page_num'])
+        data['name'] = callback_data['name']
+
+    if callback_data['name'] == 'homework':
+        answer = ("Для добавления домашнего задания, укажите название предмета, "
+                  "далее на следующих строчках Ваше Д/З (до 5-ти строчек)\n"
+                  "Например: \n"
+                  "<b>БЖД \n"
+                  "Подготовить первую практику на некст пару \n"
+                  "Сделать 1, 2 лабы \n"
+                  "Выучить термины. \n"
+                  "*Возможная домашка №4* \n"
+                  "*Возможная домашка №5* \n"
+                  "</b>")
+        await HomeworkStates.input_data.set()
+    else:
+        answer = ("Для добавления ссылки на пару, укажите "
+                  "преподавателя/предмет (в точности как в расписании), "
+                  "который желаете добавить и на следующей строке "
+                  "ссылку на занятие (BBB, zoom и т.п.)\n"
+                  "Например: \n"
+                  "<b>Иностранный язык в профессиональной сфере "
+                  "(английский язык)\n"
+                  "'Ссылка на занятие'</b>\n"
+                  "или\n"
+                  "<b>Иванов Иван Иванович\n"
+                  "'Cсылка на занятие'</b>")
+        await LinksStates.input_data.set()
 
     await bot.send_message(
         text=answer,
@@ -616,11 +616,167 @@ async def query_add_link(query: types.CallbackQuery,
         parse_mode='HTML',
     )
 
-    await LinkStates.input_link.set()
+
+@dp.message_handler(state=HomeworkStates.input_data)
+async def process_user_message_homework(message: types.Message, state: FSMContext):
+    message_text = message.text.split('\n')
+    searched_data = []
+    for text in message_text[:6]:
+        if text != '':
+            searched_data.append(text)
+
+    if not searched_data:
+        await bot.send_message(
+            text='Введенных данных недостаточно для добавления домашки!',
+            chat_id=message.chat.id,
+        )
+        return
 
 
-@dp.message_handler(state=LinkStates.input_link)
-async def process_link(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        cur_page = data['page_num']
+        message_id = data['main']
+        name = data['name']
+
+    user_book = Homework(message.chat.id)
+    result = user_book.append_data(
+        subject=searched_data[0],
+        homework=searched_data[1:],
+        pos=cur_page*user_book.WIDTH,
+    )
+    if result == 0:
+        await bot.send_message(
+            text='Предмет успешно добавлен!',
+            chat_id=message.chat.id,
+            reply_markup=user_book.back_to_main(cur_page, 'homework'),
+        )
+        text, markup = user_book.show_page(cur_page)
+        try:
+            await bot.edit_message_text(
+                text=text,
+                chat_id=message.chat.id,
+                message_id=message_id,
+                reply_markup=markup,
+            )
+        except MessageNotModified:
+            # Информация на странице не изменилась
+            pass
+        await state.finish()
+    elif result == -1:
+        await bot.send_message(
+            text=('Ваших предметов стало слишком много,'
+                  'удалите лишние с помощью кнопки '
+                  '<b>Удалить предмет</b>'),
+            chat_id=message.chat.id,
+            parse_mode='HTML',
+        )
+        await state.finish()
+    else:
+        await bot.send_message(
+            text='Что-то пошло не так, попробуйте снова!',
+            chat_id=message.chat.id
+        )
+
+
+
+@dp.callback_query_handler(Book.list.filter(action='add2'))
+async def query_additional_data(query: types.CallbackQuery,
+                                callback_data: typing.Dict[str, str],
+                                state: FSMContext):
+    user_book = Homework(query.message.chat.id)
+    data = user_book.parse_msg(query.message.text)[0]
+    ind = int(data[0])-1
+    page_data = data[1:]
+    cur_page = int(callback_data['page_num'])
+    res = user_book.check_existing_data(page_data, ind)
+    if res == -1:
+        await query.answer("Вы пытаетесь изменить несуществующие"
+                           "/измененные данные!")
+        text, markup = user_book.show_page(cur_page)
+        await query.message.edit_text(
+            text=text,
+            reply_markup=markup,
+        )
+        return
+    elif user_book.pages[res] != page_data:
+        text, markup = user_book.view_data_element(cur_page, ind)
+        try:
+            await bot.edit_message_text(
+                text=text,
+                chat_id=query.message.chat.id,
+                message_id=query.message.message_id,
+                reply_markup=markup,
+            )
+        except MessageNotModified:
+            # Информация в домашке не изменилась
+            pass
+
+    await query.answer()
+    async with state.proxy() as data:
+        data['main'] = query.message.message_id
+        data['page_num'] = int(callback_data['page_num'])
+        data['ind'] = int(callback_data['id'])
+        data['name'] = callback_data['name']
+
+    answer = "Введите данные для добавления новой домашки"
+    await HomeworkStates.input_homework.set()
+
+    await bot.send_message(
+        text=answer,
+        chat_id=query.message.chat.id,
+    )
+
+
+@dp.message_handler(state=HomeworkStates.input_homework)
+async def process_user_homework_detail_info(message: types.Message,
+                                            state: FSMContext):
+    message_text = message.text.split('\n')[0]
+
+    async with state.proxy() as data:
+        ind = data['ind']
+        cur_page = data['page_num']
+        message_id = data['main']
+        name = data['name']
+    user_book = Homework(message.chat.id)
+    result = user_book.append_data(
+        homework=message_text,
+        ind=ind,
+    )
+    if result == 0:
+        await bot.send_message(
+            text='Домашка успешно добавлена!',
+            chat_id=message.chat.id,
+        )
+        text, markup = user_book.view_data_element(cur_page, ind)
+        try:
+            await bot.edit_message_text(
+                text=text,
+                chat_id=message.chat.id,
+                message_id=message_id,
+                reply_markup=markup,
+            )
+        except MessageNotModified:
+            # Информация на странице не изменилась
+            pass
+        await state.finish()
+    elif result == -1:
+        await bot.send_message(
+            text=('Ваших домашек стало слишком много, '
+                  'удалите лишние с помощью кнопки '
+                  '<b>Удалить домашку</b>'),
+            chat_id=message.chat.id,
+            parse_mode='HTML',
+        )
+        await state.finish()
+    else:
+        await bot.send_message(
+            text='Что-то пошло не так, попробуйте снова!',
+            chat_id=message.chat.id
+        )
+
+
+@dp.message_handler(state=LinksStates.input_data)
+async def process_user_message_link(message: types.Message, state: FSMContext):
     message_text = message.text.split('\n')
     searched_data = []
     for text in message_text:
@@ -636,25 +792,25 @@ async def process_link(message: types.Message, state: FSMContext):
         )
         return
 
+
     async with state.proxy() as data:
+        user_book = Links(message.chat.id)
         cur_page = data['page_num']
-        result = lm.append_link(message.chat.id,
-                                *searched_data,
-                                cur_page*lm.WIDTH)
+        result = user_book.append_data(*searched_data,
+                                       cur_page*user_book.WIDTH)
         if result == 0:
             await bot.send_message(
                 text='Ссылка успешно добавлена!',
                 chat_id=message.chat.id,
-                reply_markup=lm.back_to_main(cur_page),
+                reply_markup=user_book.back_to_main(cur_page, 'links'),
             )
-            text, markup = lm.show_page(message.chat.id, cur_page)
+            text, markup = user_book.show_page(cur_page)
             try:
                 await bot.edit_message_text(
                     text=text,
                     chat_id=message.chat.id,
                     message_id=data['main'],
                     reply_markup=markup,
-                    parse_mode='HTML',
                 )
             except MessageNotModified:
                 # Информация на странице не изменилась
@@ -662,7 +818,7 @@ async def process_link(message: types.Message, state: FSMContext):
             await state.finish()
         elif result == -1:
             await bot.send_message(
-                text=('Ваших ссылок стало слишком много,'
+                text=('Ваших ссылок стало слишком много, '
                       'удалите лишние с помощью кнопки '
                       '<b>Удалить ссылку</b>'),
                 chat_id=message.chat.id,
@@ -676,33 +832,266 @@ async def process_link(message: types.Message, state: FSMContext):
             )
 
 
-# @dp.callback_query_handler(lm.list.filter(action='del'))
-# async def query_delete_link_by_num(
-#         query: types.CallbackQuery,
-#         callback_data: typing.Dict[str, str],
-#         state: FSMContext):
-#
-#     await query.answer('Для удаления ссылки из списка напишите его номер')
-#
-#     if len(lm.get_links(query.message.chat.id)) == 0:
-#         await bot.send_message(
-#             text="Ваш список ссылок пуст!",
-#             chat_id=query.message.chat.id,
-#             parse_mode='HTML',
-#         )
-#         return await state.finish()
-#
-#     async with state.proxy() as data:
-#         data['main'] = query.message.message_id
-#         data['page_num'] = int(callback_data['page_num'])
-#
-#     await bot.send_message(
-#         text='Для удаления ссылки из списка напишите его номер',
-#         chat_id=query.message.chat.id,
-#         parse_mode='HTML',
-#     )
-#
-#     await LinkStates.del_link.set()
+@dp.callback_query_handler(Book.list.filter(action='edit'), state='*')
+async def query_edit_info(query: types.CallbackQuery,
+                          callback_data: typing.Dict[str, str],
+                          state: FSMContext):
+
+    if callback_data['name'] == 'homework':
+        user_book = Homework(query.message.chat.id)
+        additional = ''
+        await HomeworkStates.edit_data.set()
+    else:
+        user_book = Links(query.message.chat.id)
+        additional = '/преподавателя'
+        await LinksStates.edit_data.set()
+    data = user_book.parse_msg(query.message.text)[0]
+    ind = int(data[0])-1
+    page_data = data[1:]
+    cur_page = int(callback_data['page_num'])
+    res = user_book.check_existing_data(page_data, ind)
+    if res == -1:
+        await query.answer("Вы пытаетесь изменить несуществующие"
+                           "/измененные данные!")
+        text, markup = user_book.show_page(cur_page)
+        await query.message.edit_text(
+            text=text,
+            reply_markup=markup,
+        )
+        return
+
+    variant = callback_data['id']
+    answer = 'Введите '
+    if variant == '1':
+        additional = f'новый предмет{additional}'
+    elif variant == '2':
+        additional = 'новую ссылку'
+    else:
+        additional = 'новую информацию'
+    answer += additional
+    await query.answer(answer)
+
+    async with state.proxy() as data:
+        data['main'] = query.message.message_id
+        data['page_num'] = cur_page
+        data['var'] = variant
+        data['ind'] = ind
+
+    await bot.send_message(
+        text=answer,
+        chat_id=query.message.chat.id,
+    )
+
+
+@dp.message_handler(state=HomeworkStates.edit_data)
+async def state_edit_homework(message: types.Message, state: FSMContext):
+    message_text = message.text.split('\n')[0]
+    user_book = Homework(message.chat.id)
+    async with state.proxy() as data:
+        cur_page = data['page_num']
+        ind = data['ind']
+        variant = data['var']
+        message_id = data['main']
+    if variant == '1':
+        user_book.update_data_element_first_pos(message_text, ind)
+    text, markup = user_book.view_data_element(cur_page, ind)
+    try:
+        await bot.edit_message_text(
+            text=text,
+            chat_id=message.chat.id,
+            message_id=message_id,
+            reply_markup=markup,
+        )
+    except MessageNotModified:
+        # Информация в домашке не изменилась
+        pass
+    await state.finish()
+
+
+@dp.message_handler(state=LinksStates.edit_data)
+async def state_edit_link(message: types.Message, state: FSMContext):
+    message_text = message.text.split('\n')[0]
+    user_book = Links(message.chat.id)
+    async with state.proxy() as data:
+        cur_page = data['page_num']
+        ind = data['ind']
+        variant = data['var']
+        if variant == '1':
+            user_book.update_data_element_first_pos(message_text, ind)
+        elif variant == '2':
+            user_book.update_data_element_second_pos(message_text, ind)
+        text, markup = user_book.view_data_element(cur_page, ind)
+        try:
+            await bot.edit_message_text(
+                text=text,
+                chat_id=message.chat.id,
+                message_id=data['main'],
+                reply_markup=markup,
+            )
+        except MessageNotModified:
+            # Информация в ссылке не изменилась
+            pass
+        await state.finish()
+
+
+@dp.callback_query_handler(Book.list.filter(action='edit2', name='homework'))
+async def query_edit_detail_info(query: types.CallbackQuery,
+                                 callback_data: typing.Dict[str, str],
+                                 state: FSMContext):
+    user_book = Homework(query.message.chat.id)
+    data = user_book.parse_msg(query.message.text)[0]
+    page_data = data[1:]
+    res = user_book.check_existing_data(page_data, int(data[0])-1)
+    if res == -1:
+        await query.answer("Вы пытаетесь изменить несуществующие"
+                           "/измененные данные!")
+        text, markup = user_book.show_page()
+        await query.message.edit_text(
+            text=text,
+            reply_markup=markup,
+        )
+        return
+    ind_sub = res
+    ind_hmw = int(callback_data['page_num']) - 1
+    user_pages = user_book.pages[ind_sub][1]
+    if len(user_pages)-1 < ind_hmw or user_pages[ind_hmw] != page_data[1][0]:
+        ind_hmw = user_pages.index(page_data[1][0])
+
+        text, markup = user_book.view2_data_element(ind_sub, ind_hmw)
+        try:
+            await bot.edit_message_text(
+                text=text,
+                chat_id=query.message.chat.id,
+                message_id=query.message.message_id,
+                reply_markup=markup,
+            )
+        except MessageNotModified:
+            # Информация в домашке не изменилась
+            pass
+
+    await query.answer()
+    async with state.proxy() as data:
+        data['main'] = query.message.message_id
+        data['ind_sub'] = ind_sub
+        data['ind_hmw'] = ind_hmw
+
+    answer = "Введите новые данные для домашки"
+    await HomeworkStates.edit_homework.set()
+
+    await bot.send_message(
+        text=answer,
+        chat_id=query.message.chat.id,
+        parse_mode='HTML',
+    )
+
+
+@dp.message_handler(state=HomeworkStates.edit_homework)
+async def state_edit_homework_detail_info(message: types.Message,
+                                          state: FSMContext):
+    message_text = message.text.split('\n')[0]
+    user_book = Homework(message.chat.id)
+    async with state.proxy() as data:
+        message_id = data['main']
+        ind_sub = data['ind_sub']
+        ind_hmw = data['ind_hmw']
+    user_book.update_data_element_second_pos(message_text, ind_sub, ind_hmw)
+    text, markup = user_book.view2_data_element(ind_sub, ind_hmw)
+    try:
+        await bot.edit_message_text(
+            text=text,
+            chat_id=message.chat.id,
+            message_id=message_id,
+            reply_markup=markup,
+        )
+    except MessageNotModified:
+        # Информация в домашке не изменилась
+        pass
+    await state.finish()
+
+
+@dp.callback_query_handler(Book.list.filter(action='delete'), state='*')
+async def query_delete_data(query: types.CallbackQuery,
+                            callback_data: typing.Dict[str, str],
+                            state: FSMContext):
+    await state.finish()
+
+    if callback_data['name'] == 'homework':
+        user_book = Homework(query.message.chat.id)
+        information = 'Предмет'
+        data_element = user_book.parse_msg(query.message.text)[0][1:]
+    else:
+        user_book = Links(query.message.chat.id)
+        information = 'Ссылка'
+        data_element = user_book.parse_msg(query.message.text)[0][1:]
+    try:
+        result = user_book.delete_data_element_by_info(data_element)
+        if result == 0:
+            await query.answer(f'Данные успешно удалены!')
+        elif result == -1:
+            await query.answer(f'{information} отсутствует.')
+    except:
+        log.exception('Something went wrong with deleting link'
+                      f'user ID:[{query.message.chat.id}]')
+        await query.answer('Произошла непредвиденная ошибка.')
+
+    cur_page = int(callback_data['page_num'])
+    text, markup = user_book.show_page(cur_page)
+    await query.message.edit_text(
+        text=text,
+        reply_markup=markup,
+    )
+
+
+@dp.callback_query_handler(Book.list.filter(action='delete2', name='homework'), state='*')
+async def query_delete_homework(query: types.CallbackQuery,
+                                callback_data: typing.Dict[str, str],
+                                state: FSMContext):
+    await state.finish()
+
+    user_book = Homework(query.message.chat.id)
+    data = user_book.parse_msg(query.message.text)[0]
+    page_data = data[1:]
+    res = user_book.check_existing_data(page_data, int(data[0])-1)
+    if res == -1:
+        await query.answer("Вы пытаетесь изменить несуществующие"
+                           "/измененные данные!")
+        text, markup = user_book.show_page()
+        await query.message.edit_text(
+            text=text,
+            reply_markup=markup,
+        )
+        return
+    ind_sub = res
+    ind_hmw = int(callback_data['page_num']) - 1
+    cur_page = ind_sub+1 // user_book.WIDTH
+    user_pages = user_book.pages[ind_sub][1]
+
+    if len(user_pages)-1 < ind_hmw or user_pages[ind_hmw] != page_data[1][0]:
+        ind_hmw = user_pages.index(page_data[1][0])
+    information = 'Домашка'
+    result = user_book.delete_homework_by_ind(ind_sub, ind_hmw)
+    if result == 0:
+        await query.answer(f'Данные успешно удалены!')
+    elif result == -1:
+        await query.answer(f'{information} отсутствует.')
+    try:
+        pass
+    except:
+        log.exception('Something went wrong with deleting link'
+                      f'user ID:[{query.message.chat.id}]')
+        await query.answer('Произошла непредвиденная ошибка.')
+
+    text, markup = user_book.view_data_element(cur_page, ind_sub)
+    try:
+        await bot.edit_message_text(
+            text=text,
+            chat_id=query.message.chat.id,
+            message_id=query.message.message_id,
+            reply_markup=markup,
+        )
+    except MessageNotModified:
+        # Информация в домашке не изменилась
+        pass
 
 
 def main():

@@ -58,7 +58,7 @@ def update_schedule_user(user_id, group_code, group_subnum):
                  ('schedule_next_week', schedule_weeks[1])),
                 'user_id', user_id,
         )
-        log.warning(f'ID:[{user_id}] schedule successful updated db->users')
+        log.info(f'ID:[{user_id}] schedule successful updated db->users')
 
 
 def get_formatted_schedule(user_id, range, requested_week='cur'):

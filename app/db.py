@@ -30,7 +30,8 @@ def init_db():
         notifications BOOL,
         schedule_cur_week JSON,
         schedule_next_week JSON,
-        link JSON,
+        links JSON,
+        homework JSON,
         preferences JSON);
     """)
 
@@ -89,6 +90,7 @@ def insert_new_user(
         notifications=0,
         schedule_cur_week='', schedule_next_week='',
         links='[]',
+        homework='[]',
         references={'pref_time': 5,
                     'notification_type': 'distant',
                     'foreign_lan': ''}):
@@ -98,6 +100,7 @@ def insert_new_user(
         notifications,
         schedule_cur_week, schedule_next_week,
         links,
+        homework,
         json.dumps(references, ensure_ascii=False),
     )
 
