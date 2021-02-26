@@ -114,7 +114,7 @@ class Links(Book):
     @property
     def pages(self):
         self._pages = json.loads(
-            db.get('users', 'link', 'user_id', self.user_id))
+            db.get('users', 'links', 'user_id', self.user_id))
         self._pages = [[str(e) for e in pair] for pair in self._pages]
         return self._pages
 
@@ -124,7 +124,7 @@ class Links(Book):
         if isinstance(value, list):
             self._pages = value
             user_data = json.dumps(self._pages, ensure_ascii=False)
-            db.update('users', (('link', user_data), ), 'user_id', self.user_id)
+            db.update('users', (('links', user_data), ), 'user_id', self.user_id)
         else:
             raise TypeError
 
