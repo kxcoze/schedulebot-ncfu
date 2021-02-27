@@ -54,7 +54,7 @@ def prepare_receivers(cur_lesson):
     verification_time = (lesson_start - now).seconds // 60
     data = db.fetchall(
         'users', ('user_id', 'notifications', 'subgroup', 'preferences'))
-    print(data, verification_time)
+    
     subscribers = []
     for user in data:
         pref_time = int(json.loads(user['preferences'])['pref_time'])
