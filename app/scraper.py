@@ -1,9 +1,9 @@
 import os
 import time
-import requests
 import subprocess
 import logging
 
+import requests
 from bs4 import BeautifulSoup as BS4
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -11,7 +11,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 
-CHROMEDRIVER_PATH = os.getenv('CHROMEDRIVER_PATH')
+# CHROMEDRIVER_PATH = os.getenv('CHROMEDRIVER_PATH')
+GECKODRIVER_PATH = os.getenv('GECKODRIVER_PATH')
 log = logging.getLogger('app_logger')
 
 
@@ -47,10 +48,10 @@ class SelScrapingSchedule:
         url = 'https://ecampus.ncfu.ru/schedule'
         log.info(f'Initialize getting all specialities from {url}')
         try:
-            options = webdriver.ChromeOptions()
+            options = webdriver.FirefoxOptions()
             options.add_argument('--headless')
-            browser = webdriver.Chrome(
-                executable_path=CHROMEDRIVER_PATH, options=options)
+            browser = webdriver.Firefox(
+                executable_path=GECKODRIVER_PATH, options=options)
             browser.get(url)
         except:
             self.restart_script(browser)
@@ -88,19 +89,7 @@ class SelScrapingSchedule:
                                 By.XPATH,
                                 XPATH_to_institutes))
                     )
-                    browser.execute_script(
-                        'arguments[0].scrollIntoView('
-                        '{behavior: "smooth", '
-                        'block: "center",'
-                        'inline: "nearest"})', item)
-                    time.sleep(1)
-                    ActionChains(browser).move_to_element(item).click(on_element=item).perform()
-                    time.sleep(1)
-                    browser.execute_script(
-                        'arguments[0].scrollIntoView('
-                        '{behavior: "smooth", '
-                        'block: "center",'
-                        'inline: "nearest"})', item)
+                    item.click()
                     log.info(f'Successful clicked on this: {item}')
                     specialities = wait.until(
                                 EC.presence_of_all_elements_located((
@@ -114,20 +103,7 @@ class SelScrapingSchedule:
                                         By.XPATH,
                                         XPATH_to_specialities))
                             )
-
-                            browser.execute_script(
-                                'arguments[0].scrollIntoView('
-                                '{behavior: "smooth", '
-                                'block: "center",'
-                                'inline: "nearest"})', speciality)
-                            time.sleep(1)
-                            ActionChains(browser).move_to_element(speciality).click(on_element=speciality).perform()
-                            time.sleep(1)
-                            browser.execute_script(
-                                'arguments[0].scrollIntoView('
-                                '{behavior: "smooth", '
-                                'block: "center",'
-                                'inline: "nearest"})', speciality)
+                            speciality.click()
                             log.info(f'Successful clicked on this: {speciality}')
                         except:
                             log.exception("Cannot load list of groups!")
@@ -203,10 +179,10 @@ class SelParser:
         self.URL = url
 
     def get_jshtml(self):
-        options = webdriver.ChromeOptions()
+        options = webdriver.FirefoxOptions()
         options.add_argument('--headless')
-        browser = webdriver.Chrome(
-            executable_path=CHROMEDRIVER_PATH, options=options)
+        browser = webdriver.Firefox(
+            executable_path=GECKODRIVER_PATH, options=options)
         html = ''
         try:
             browser.get(self.URL)
@@ -217,10 +193,10 @@ class SelParser:
         return html
 
     def get_schedule_html(self):
-        options = webdriver.ChromeOptions()
+        options = webdriver.FirefoxOptions()
         options.add_argument('--headless')
-        browser = webdriver.Chrome(
-            executable_path=CHROMEDRIVER_PATH, options=options)
+        browser = webdriver.Firefox(
+            executable_path=GECKODRIVER_PATH, options=options)
         browser.get(self.URL)
         cur_week_html, next_week_html = '', ''
         try:
