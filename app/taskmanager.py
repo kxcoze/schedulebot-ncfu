@@ -54,7 +54,7 @@ def prepare_receivers(cur_lesson):
     verification_time = (lesson_start - now).seconds // 60
     data = db.fetchall(
         'users', ('user_id', 'notifications', 'subgroup', 'preferences'))
-
+    print(data, verification_time)
     subscribers = []
     for user in data:
         pref_time = int(json.loads(user['preferences'])['pref_time'])
@@ -114,7 +114,7 @@ def prepare_receivers(cur_lesson):
                 lessonType = f"{searched_lesson['lessonType']}\n"
 
             links = json.loads(
-                db.get('users', 'link', 'user_id', sub['user_id']))
+                db.get('users', 'links', 'user_id', sub['user_id']))
             searched_link = ''
             for link in links:
                 # Может реализовать по совпадениям?
