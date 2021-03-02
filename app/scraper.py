@@ -50,8 +50,9 @@ class SelScrapingSchedule:
         try:
             options = webdriver.FirefoxOptions()
             options.add_argument('--headless')
-            browser = webdriver.Firefox(
-                executable_path=GECKODRIVER_PATH, options=options)
+            browser = webdriver.Firefox(options=options)
+            # browser = webdriver.Firefox(
+            #     executable_path=GECKODRIVER_PATH, options=options)
             browser.get(url)
         except:
             self.restart_script(browser)
@@ -181,8 +182,9 @@ class SelParser:
     def get_jshtml(self):
         options = webdriver.FirefoxOptions()
         options.add_argument('--headless')
-        browser = webdriver.Firefox(
-            executable_path=GECKODRIVER_PATH, options=options)
+        browser = webdriver.Firefox(options=options)
+        # browser = webdriver.Firefox(
+        #     executable_path=GECKODRIVER_PATH, options=options)
         html = ''
         try:
             browser.get(self.URL)
@@ -195,8 +197,9 @@ class SelParser:
     def get_schedule_html(self):
         options = webdriver.FirefoxOptions()
         options.add_argument('--headless')
-        browser = webdriver.Firefox(
-            executable_path=GECKODRIVER_PATH, options=options)
+        browser = webdriver.Firefox(options=options)
+        # browser = webdriver.Firefox(
+        #     executable_path=GECKODRIVER_PATH, options=options)
         browser.get(self.URL)
         cur_week_html, next_week_html = '', ''
         try:
@@ -207,9 +210,9 @@ class SelParser:
                 if 'selected' in element.get_attribute('class'):
                     index_to_click = index + 1
                     break
-            time.sleep(1)
+            # time.sleep(1)
             elements[index_to_click].click()
-            time.sleep(1)
+            # time.sleep(1)
             next_week_html = browser.page_source
         except:
             log.exception('Something went wrong in headless browser!')

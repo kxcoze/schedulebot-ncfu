@@ -195,7 +195,8 @@ async def wait_for_group_name(message: types.Message, state: FSMContext):
     group_code = db.get('univer_code', 'group_code', 'group_name', group_name)
     # Возможно есть реализация получше! Может быть перенести в другой скрипт?
     if not group_code == -1:
-        answer_success = await message.answer("Группа найдена, пробуем загрузить Ваше расписание...")
+        answer_success = await message.answer("Группа найдена, пробуем загрузить Ваше расписание... (среднее время ожидания ~25 сек.)")
+        await state.finish()
         try:
             await asyncio.get_running_loop().run_in_executor(
                 ex, SC.update_schedule_user,
@@ -215,8 +216,6 @@ async def wait_for_group_name(message: types.Message, state: FSMContext):
                 message_id=answer_success.message_id,
                 text="Произошла непредвиденная ошибка!\n"
                      "Пожалуйста, попробуйте позже.")
-        finally:
-            await state.finish()
     else:
         await message.reply("Введенная группа не существует, попробуйте снова")
 
