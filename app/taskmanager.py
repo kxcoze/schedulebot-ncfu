@@ -3,6 +3,7 @@ import threading
 import json
 import asyncio
 import logging
+from pprint import pprint
 from datetime import datetime, timedelta
 
 import schedule
@@ -54,7 +55,7 @@ def prepare_receivers(cur_lesson):
     verification_time = (lesson_start - now).seconds // 60
     data = db.fetchall(
         'users', ('user_id', 'notifications', 'subgroup', 'preferences'))
-    
+
     subscribers = []
     for user in data:
         pref_time = int(json.loads(user['preferences'])['pref_time'])
@@ -65,45 +66,43 @@ def prepare_receivers(cur_lesson):
         schedulejs = json.loads(
             db.get('users', 'schedule_cur_week', 'user_id', sub['user_id']))
 
-        searched_lesson = ''
+        searched_lessons = []
+        sub_prefs = json.loads(sub['preferences'])
         for day in schedulejs:
             lesson_day = int(day['date'].split(' ')[0])
             cur_day = datetime.today().day
             if day['weekday'] == cur_string_day and lesson_day == cur_day:
                 for lesson in day['lessons']:
-                    if lesson['number'][0] == cur_lesson:
-                        searched_lesson = lesson
-                        break
+                    if lesson['number'][0] == cur_lesson and \
+                            (lesson['groupNumber'] == '' or \
+                            sub['subgroup'] == '0' or \
+                            sub['subgroup'] in lesson['groupNumber']) and \
+                            (sub_prefs['notification_type'] == 'all' or \
+                            lesson['audName'] not in 'ВКС/ЭТ' and \
+                            sub_prefs['notification_type'] == 'full-time' or \
+                            lesson['audName'] in 'ВКС/ЭТ' and \
+                            sub_prefs['notification_type'] == 'distant') and \
+                            ('Иностранный язык в' not in lesson['lessonName'] or \
+                            sub_prefs['foreign_lan'] in lesson['lessonName']):
+                        searched_lessons.append(lesson)
 
-        sub_preferences = json.loads(sub['preferences'])
-        if searched_lesson == '' or sub['subgroup'] != '0' and \
-                sub['subgroup'] not in searched_lesson['groupNumber'] and \
-                searched_lesson['groupNumber'] != '':
+        if not searched_lessons:
             continue
 
-        elif 'Иностранный язык в' in searched_lesson['lessonName'] and \
-                sub_preferences['foreign_lan'] not \
-                in searched_lesson['lessonName']:
-            continue
-
+        start = ''
+        if verification_time == 60:
+            start = 'Через час'
+        elif verification_time == 0:
+            start = 'Сейчас'
         else:
-            sub_lesson_preference = sub_preferences['notification_type']
-            audName = ''
-            if searched_lesson['audName'] in 'ВКС/ЭТ':
-                if sub_lesson_preference == 'full-time':
-                    continue
-            else:
-                if sub_lesson_preference == 'distant':
-                    continue
-                audName = f"Аудитория: {searched_lesson['audName']}\n"
+            start = f'Через {verification_time} мин.'
 
-            start = ''
-            if verification_time == 60:
-                start = 'Через час'
-            elif verification_time == 0:
-                start = 'Сейчас'
+        message = f"{start} начнётся {cur_lesson} пара:\n"
+        for searched_lesson in searched_lessons[::-1]:
+            if searched_lesson['audName'] in 'ВКС/ЭТ':
+                audName = ''
             else:
-                start = f'Через {verification_time} минут'
+                audName = f"Аудитория: {searched_lesson['audName']}\n"
 
             group_number = ''
             if sub['subgroup'] == '0' and searched_lesson['groupNumber'] != '':
@@ -130,17 +129,15 @@ def prepare_receivers(cur_lesson):
                     searched_link = f'\nСсылка на пару: {link[-1]}'
                     break
 
-            message = (
-                f"{start} начнётся {searched_lesson['number'][0]} пара:\n"
+            message += (
+                f"{group_number}"
                 f"{searched_lesson['lessonName']}\n"
                 f"{lessonType}"
-                f"{group_number}"
                 f"Преподаватель: {searched_lesson['teacherName']}\n"
                 f"{audName}"
-                f"{searched_link}"
+                f"{searched_link}\n\n"
             )
-            receivers.append(
-                {'user_id': sub['user_id'], 'message': message})
+        receivers.append({'user_id': sub['user_id'], 'message': message})
 
     return receivers
 

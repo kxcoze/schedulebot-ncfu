@@ -12,7 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 
 # CHROMEDRIVER_PATH = os.getenv('CHROMEDRIVER_PATH')
-GECKODRIVER_PATH = os.getenv('GECKODRIVER_PATH')
+# GECKODRIVER_PATH = os.getenv('GECKODRIVER_PATH')
 log = logging.getLogger('app_logger')
 
 
@@ -210,9 +210,9 @@ class SelParser:
                 if 'selected' in element.get_attribute('class'):
                     index_to_click = index + 1
                     break
-            # time.sleep(1)
+            time.sleep(0.25)
             elements[index_to_click].click()
-            # time.sleep(1)
+            time.sleep(0.25)
             next_week_html = browser.page_source
         except:
             log.exception('Something went wrong in headless browser!')

@@ -248,13 +248,16 @@ async def set_user_notification(message: types.Message):
     db.check_user(message.chat.id)
 
     db.update('users', (('notifications', 1), ), 'user_id', message.chat.id)
-    pref_time = json.loads(db.get(
-        'users', 'preferences', 'user_id', message.chat.id))['pref_time']
+    user_preferences = json.loads(db.get(
+        'users', 'preferences', 'user_id', message.chat.id))
+    pref_time = user_preferences['pref_time']
+    pref_type_lesson = SC._get_meaning_of_preferences()[user_preferences['notification_type']]
     await message.reply(
-        "Вы успешно подписались на уведомления о начале пары!\n\n"
-        f"Время за которое Вас уведомлять о начале пары: {pref_time} мин.\n"
-        "Желаете ли определить время за которое Вас оповещать?\n"
-        "Если да, нажмите/введите /setpreferences"
+        "Вы успешно подписались на уведомления о начале пары! \n\n"
+        f"Время за которое Вас уведомлять о начале пары: <b>{pref_time}</b> мин.\n"
+        f"Уведомляемый тип пар: <b>{pref_type_lesson}</b> \n"
+        "Для настройки уведомлений воспользуйтесь: \n/setpreferences",
+        parse_mode='HTML'
     )
 
 
@@ -407,7 +410,8 @@ async def wait_user_language_preferences(query: types.CallbackQuery, state: FSMC
         'Напишите язык, который Вам преподается на паре типа:\n'
         '<b>Иностранный язык в профессиональной сфере (ваш язык)</b>\n\n'
         'Например можно указать (в любом регистре):\n'
-        '<em>Английский</em> или <em>Русский</em>'
+        '<b><em>Английский</em></b> или <b><em>Русский</em></b>\n'
+        'Если желаете убрать язык напишите одиночное тире: <b><em>-</em></b>'
     )
     await bot.send_message(
         text=answer,
@@ -422,10 +426,23 @@ async def wait_user_language_preferences(query: types.CallbackQuery, state: FSMC
 async def set_user_language_preferences(message: types.Message, state: FSMContext):
     # Добавить обработку отсутствия пользователя в БД
     db.check_user(message.chat.id)
+    msg = message.text.split('\n')[0]
+    if not msg.isalpha() and msg != '-':
+        await message.answer(
+            "Вы ввели не строку! Попробуйте ещё раз."
+        )
+        return
+    elif len(msg) > 30:
+        await message.answer(
+            "Такое кол-во символов недопустимо! Попробуйте ещё раз."
+        )
+        return
+    elif msg == '-':
+        msg = ''
 
     preferences = json.loads(
         db.get('users', 'preferences', 'user_id', message.chat.id))
-    preferences['foreign_lan'] = message.text.split('\n')[0].lower()
+    preferences['foreign_lan'] = msg.lower()
     db.update(
         'users',
         (('preferences', json.dumps(preferences, ensure_ascii=False)), ),
