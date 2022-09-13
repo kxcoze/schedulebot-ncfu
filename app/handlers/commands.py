@@ -107,8 +107,8 @@ async def cmd_wait_user_group(message: types.Message, **kwargs):
         "Введите название группы (в любом регистре) и укажите "
         "номер подгруппы (можно оставить пустым), например:\n"
         "<em>ЭКП-б-о-19-1</em> \n"
-        "<em>КГИ-б-о-18-1(1)</em> \n"
-        "<em>тбо-б-о-19-1 2</em> \n"
+        "<em>КГИ-б-о-20-1(1)</em> \n"
+        "<em>тбо-б-о-21-1 2</em> \n"
     )
 
     await SetGroupStates.waiting_for_group_name.set()

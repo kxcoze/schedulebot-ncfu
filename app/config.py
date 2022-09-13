@@ -31,10 +31,10 @@ def load_config():
         db=DB(
             host=getenv("DB_HOST"),
             db_name=getenv("DB_NAME"),
-            user=getenv("DB_USER")),
+            user=getenv("DB_USER"),
             password=getenv("DB_PASSWORD"),
         ),
-        update_group_codes=(getenv("UPDATE_GROUPS") or False),
+        update_group_codes=(getenv("UPDATE_GROUPS", "False") == "True"),
     )
 
 

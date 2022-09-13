@@ -4,6 +4,7 @@ import logging
 from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext, filters
 from aiogram.dispatcher.filters.state import State, StatesGroup
+from aiogram.utils.exceptions import MessageNotModified
 from sqlalchemy import select
 
 from db.models import User, Group
@@ -42,20 +43,15 @@ async def state_set_user_group(message: types.Message, **kwargs):
 
     msg = message.text.split("\n")
     # Регулярное выражение для поиска группы
-    regroup = re.compile(
-        "(([а-яА-я]-[а-яА-Я]{3}|[а-яА-Я]{3})-[а-я]+?-[а-я]+?-\\d{1,3}"
-        "(-[0-9а-яА-Я.]+|-\\d|))|([а-яА-я]-[а-яА-Я]{1,3}-\\d+)"
-    )
-
-    # Регулярное выражение для поиска подгруппы
-    resubgroup = re.compile("[^-\\d]([0-9]{1})([^-\\d]|\\Z)")
-
+    regroup = re.compile(r"(.+?)[\s|\(]")
     try:
-        group_name = regroup.search(message.text).group().lower()
+        group_name = regroup.search(f"{message.text} ").groups()[0].lower().strip()
     except AttributeError:
         await message.reply("Введен неверный формат группы!")
         return
 
+    # Регулярное выражение для поиска подгруппы
+    resubgroup = re.compile(".*[\s|(](\d)")
     try:
         # Поиск подгруппы в сообщении пользователя
         group_subnum = resubgroup.search(message.text).groups()[0]
@@ -64,8 +60,13 @@ async def state_set_user_group(message: types.Message, **kwargs):
 
     db_session = message.bot.get("db")
     async with db_session() as session:
-        res = await session.execute(select(Group).where(Group.name == group_name))
-        group: Group = res.fetchone()[0] if res.fetchone() else None
+        res = (
+            await session.execute(select(Group).where(Group.name == group_name))
+        ).fetchone()
+        if res:
+            group: Group = res[0]
+        else:
+            group = None
 
     if group:
         answer_success = await message.answer(
@@ -87,6 +88,7 @@ async def state_set_user_group(message: types.Message, **kwargs):
 
                 user: User = await session.get(User, message.chat.id)
                 user.group_id = group.id
+                user.subgroup = int(group_subnum)
                 await session.commit()
 
                 await message.bot.edit_message_text(

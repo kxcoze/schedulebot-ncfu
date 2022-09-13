@@ -12,6 +12,7 @@ services:
             - DB_USER
             - DB_PASS
             - DB_NAME
+            - UPDATE_GROUPS
         depends_on:
             - db
     db:
@@ -19,7 +20,7 @@ services:
         restart: always
         environment:
             POSTGRES_USER: ${DB_USER}
-            POSTGRES_PASSWORD: ${DB_PASS}
             POSTGRES_DB: ${DB_NAME}
+            POSTGRES_HOST_AUTH_METHOD: "trust"
         volumes:
-            - "/path/to/your/postgres/directory:/var/lib/postgresql/data"
+            - "/var/lib/postgresql/14/main"

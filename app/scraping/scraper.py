@@ -10,6 +10,8 @@ locale.setlocale(locale.LC_ALL, "ru_RU.UTF-8")
 
 
 async def parse_json(json_data, id):
+    if not json_data:
+        raise ValueError("json data is empty. maybe group schedule is empty?")
     result = []
     for day in json_data:
         weekday = day["WeekDay"]
@@ -23,7 +25,11 @@ async def parse_json(json_data, id):
             lesson_end = datetime.fromisoformat(lesson["TimeEnd"]).strftime("%H:%M")
             lesson_type = lesson["LessonType"].strip()
             aud_name = lesson["Aud"]["Name"]
-            teacher_name = lesson["Teacher"]["Name"].strip()
+            teacher_name = lesson.get("Teacher")
+            if teacher_name:
+                teacher_name = teacher_name["Name"].strip()
+            else:
+                teacher_name = ""
             group_number = ""
             for group in lesson["Groups"]:
                 if int(group["Id"]) == id:
@@ -85,7 +91,7 @@ async def get_data_from_getschedule(id):
 async def get_formatted_schedule(user, group, range, requested_week="cur"):
     schedulejs = getattr(group, f"schedule_{requested_week}_week")
     user_subgroup = str(user.subgroup)
-    user_foreign_lang = user.foreign_lan
+    user_foreign_lang = user.foreign_lan if user.foreign_lan else ""
 
     today = datetime.today().isoweekday() - 1
     tom = 0 if today + 1 > 6 else today + 1

@@ -177,7 +177,9 @@ async def prepare_receivers(cur_lesson):
             lessonType = ""
             if searched_lesson["lessonType"] != searched_lesson["lessonName"]:
                 lessonType = f"{searched_lesson['lessonType']}\n"
-
+            teacherName = ""
+            if searched_lesson["teacherName"]:
+                teacherName = f"Преподаватель: {searched_lesson['teacherName']}\n"
             # links = json.loads(db.get("users", "links", "user_id", sub["user_id"]))
             links = user.links
             searched_link = ""
@@ -202,7 +204,7 @@ async def prepare_receivers(cur_lesson):
                 f"{group_number}"
                 f"{searched_lesson['lessonName']}\n"
                 f"{lessonType}"
-                f"Преподаватель: {searched_lesson['teacherName']}\n"
+                f"{teacherName}"
                 f"{audName}"
                 f"{searched_link}\n\n"
             )

@@ -10,6 +10,25 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+
+FIREFOX_BINARY = FirefoxBinary("/opt/firefox/firefox")
+
+PROFILE = webdriver.FirefoxProfile()
+PROFILE.set_preference("browser.cache.disk.enable", False)
+PROFILE.set_preference("browser.cache.memory.enable", False)
+PROFILE.set_preference("browser.cache.offline.enable", False)
+PROFILE.set_preference("network.http.use-cache", False)
+PROFILE.set_preference(
+    "general.useragent.override",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:72.0) Gecko/20100101 Firefox/72.0",
+)
+
+FIREFOX_OPTS = Options()
+FIREFOX_OPTS.log.level = "trace"  # Debug
+FIREFOX_OPTS.headless = True
+GECKODRIVER_LOG = "/geckodriver.log"
 
 
 def is_element_visible_in_viewpoint(driver, element) -> bool:
@@ -59,15 +78,14 @@ class SelScrapingSchedule:
         страницы в переменную класса html"""
         url = "https://ecampus.ncfu.ru/schedule"
         logging.info(f"Initialize getting all group codes from {url}")
-        try:
-            options = webdriver.FirefoxOptions()
-            options.add_argument("--headless")
-            browser = webdriver.Firefox(options=options)
-            browser.get(url)
-        except:
-            self.restart_script(browser)
-            return
-
+        ff_opt = {
+            "firefox_binary": FIREFOX_BINARY,
+            "firefox_profile": PROFILE,
+            "options": FIREFOX_OPTS,
+            "service_log_path": GECKODRIVER_LOG,
+        }
+        browser = webdriver.Firefox(**ff_opt)
+        browser.get(url)
         XPATH_to_institutes = (
             "//div[@id='page']/div[@id='select-group']"
             "/div[@class='col-lg-7 col-md-6']"
