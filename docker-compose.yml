@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+    app:
+        image: kxcoze/schedulebot-ncfu
+        restart: always
+        stop_signal: SIGINT
+        environment:
+            - BOT_TOKEN
+            - ADMIN_TOKEN
+            - ADMIN_CHAT_ID
+            - DB_HOST
+            - DB_USER
+            - DB_PASS
+            - DB_NAME
+        depends_on:
+            - db
+    db:
+        image: postgres:14
+        restart: always
+        environment:
+            POSTGRES_USER: ${DB_USER}
+            POSTGRES_PASSWORD: ${DB_PASS}
+            POSTGRES_DB: ${DB_NAME}
+        volumes:
+            - "/path/to/your/postgres/directory:/var/lib/postgresql/data"

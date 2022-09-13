@@ -1,0 +1,10 @@
+# rename this file to .env (with the leading dot) and place it next to docker-compose.yml
+BOT_TOKEN=123456789:AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQq
+ADMIN_TOKEN = 123456789:AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQq
+ADMIN_CHAT_ID = 1234455678
+DB_HOST=localhost
+DB_NAME=db
+DB_USER=user
+DB_PASS=password
+PGADMIN_USER=admin
+PGADMIN_PASSWORD=ars123454321sar
