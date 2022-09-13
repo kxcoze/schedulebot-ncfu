@@ -1,0 +1,7 @@
+ncfubot/
+ncfubot3.9/
+server.log
+geckodriver.log
+__pycache__
+.env
+backup.sql
