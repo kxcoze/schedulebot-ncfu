@@ -73,7 +73,6 @@ async def update_groups_schedules():
         groups = [group[0] for group in (await session.execute(sql)).fetchall()]
         for group in groups:
             try:
-
                 (
                     group.schedule_cur_week,
                     group.schedule_next_week,
@@ -224,7 +223,8 @@ async def send_message_to_users(cur_lesson):
         finally:
             logging.info(f"{count} messages successful sent.")
     else:
-        logging.info("No users to send message.")
+        pass
+        # logging.info("No users to send message.")
 
 
 async def update_group_codes():
