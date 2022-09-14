@@ -22,7 +22,7 @@ from helpers import _get_schedule_bell_ncfu
 def init_engine_and_bot():
     config: Config = load_config()
     engine = create_async_engine(
-        f"postgresql+asyncpg://{config.db.user}@{config.db.host}/{config.db.db_name}",
+            f"postgresql+asyncpg://{config.db.user}:{config.db.password}@{config.db.host}/{config.db.db_name}",
         json_serializer=lambda obj: json.dumps(obj, ensure_ascii=False),
         future=True,
     )
@@ -78,7 +78,6 @@ async def update_groups_schedules():
                     group.schedule_cur_week,
                     group.schedule_next_week,
                 ) = await get_data_from_getschedule(group.id)
-                print(group.schedule_cur_week)
                 await session.commit()
                 logging.info(f"ID:{group.name} schedule successful updated")
             except:
@@ -111,8 +110,7 @@ async def prepare_receivers(cur_lesson):
     verification_time = (lesson_start - now).seconds // 60
     db_session = bot.get("db")
     async with db_session() as session:
-        sql = select(User).where(User.is_notified == True, User.group_id.is_not(None))
-        # User.is_notified==True, User.group_id.is_not(None), User.pref_time==verification_time)
+        sql = select(User).where(User.is_notified==True, User.group_id.is_not(None), User.pref_time==verification_time)
         users = [user[0] for user in (await session.execute(sql)).fetchall()]
 
         users_group_id = set([user.group_id for user in users])

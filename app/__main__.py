@@ -83,7 +83,7 @@ async def set_bot_commands(bot: Bot):
 async def main():
     config: Config = load_config()
     engine = create_async_engine(
-        f"postgresql+asyncpg://{config.db.user}@{config.db.host}/{config.db.db_name}",
+            f"postgresql+asyncpg://{config.db.user}:{config.db.password}@{config.db.host}/{config.db.db_name}",
         json_serializer=lambda obj: json.dumps(obj, ensure_ascii=False),
         future=True,
     )
