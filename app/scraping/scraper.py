@@ -1,6 +1,7 @@
 import json
 import aiohttp
 import locale
+import logging
 from datetime import datetime, timedelta
 
 from scraping.classes import SelScrapingSchedule, ParserSchedule
@@ -11,7 +12,7 @@ locale.setlocale(locale.LC_ALL, "ru_RU.UTF-8")
 
 async def parse_json(json_data, id):
     if not json_data:
-        raise ValueError("json data is empty. maybe group schedule is empty?")
+        raise ValueError(f"json data for {id} is empty. maybe group schedule is empty?")
     result = []
     for day in json_data:
         weekday = day["WeekDay"]
@@ -67,11 +68,12 @@ async def parse_json(json_data, id):
 
 async def get_data_from_getschedule(id):
     url = "https://ecampus.ncfu.ru/schedule/GetSchedule"
+    now = datetime.now() + timedelta(days=1)
     monday_cur_week = (
-        datetime.utcnow() - timedelta(days=datetime.utcnow().weekday())
+        now - timedelta(days=now.weekday())
     ).strftime("%Y-%m-%d")
     monday_next_week = (
-        (datetime.utcnow() - timedelta(days=datetime.utcnow().weekday()))
+        (now - timedelta(days=now.weekday()))
         + timedelta(days=7)
     ).strftime("%Y-%m-%d")
     async with aiohttp.ClientSession() as session:
@@ -82,9 +84,17 @@ async def get_data_from_getschedule(id):
         params = {"date": monday_next_week, "Id": id, "targetType": 2}
         async with session.post(url, params=params) as resp:
             json_next_week = await resp.json()
+    try:
+        json_cur_week = await parse_json(json_cur_week, id)
+    except ValueError as e:
+        json_cur_week = []
+        logging.warning(e)
 
-    json_cur_week = await parse_json(json_cur_week, id)
-    json_next_week = await parse_json(json_next_week, id)
+    try:
+        json_next_week = await parse_json(json_next_week, id)
+    except ValueError as e:
+        json_cur_week = []
+        logging.warning(e)
     return json_cur_week, json_next_week
 
 

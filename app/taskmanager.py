@@ -71,6 +71,7 @@ async def update_groups_schedules():
     async with db_session() as session:
         sql = select(Group).where(Group.schedule_cur_week.is_not(None))
         groups = [group[0] for group in (await session.execute(sql)).fetchall()]
+        count = 0
         for group in groups:
             try:
                 (
@@ -78,9 +79,11 @@ async def update_groups_schedules():
                     group.schedule_next_week,
                 ) = await get_data_from_getschedule(group.id)
                 await session.commit()
-                logging.info(f"ID:{group.name} schedule successful updated")
+                logging.info(f"Name:{group.name} schedule successful updated")
+                count += 1
             except:
-                logging.exception(f"ID:{group.name} failed to update schedule")
+                logging.exception(f"Name:{group.name} failed to update schedule")
+    logging.info(f"{count} schedules has been updated!")
 
 
 async def prepare_receivers(cur_lesson):
@@ -278,6 +281,7 @@ def planning_tasks():
 
     # Обновить расписание хранящиеся в БД
     schedule.every().sunday.at("00:00:00").do(prepare_to_update_groups_schedule)
+
 
     # Обновить коды университета
     schedule.every(10).weeks.do(prepare_to_update_group_codes)
