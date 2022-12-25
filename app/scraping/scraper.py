@@ -87,13 +87,13 @@ async def get_data_from_getschedule(id):
     try:
         json_cur_week = await parse_json(json_cur_week, id)
     except ValueError as e:
-        json_cur_week = []
+        json_cur_week = None
         logging.warning(e)
 
     try:
         json_next_week = await parse_json(json_next_week, id)
     except ValueError as e:
-        json_cur_week = []
+        json_cur_week = None
         logging.warning(e)
     return json_cur_week, json_next_week
 
@@ -144,7 +144,7 @@ async def get_formatted_schedule(user, group, range, requested_week="cur"):
     if range != "week":
         schedulejs = [x for x in schedulejs if x["weekday"] == date_to_operate]
 
-    if not len(schedulejs) > 0:
+    if not schedulejs:
         return f"<b><em>На {weekday} доступного расписания нет!</em></b>"
 
     formatted_schedule = f"<b><em>Расписание занятий на {weekday}</em></b>\n"
@@ -179,14 +179,17 @@ async def get_formatted_schedule(user, group, range, requested_week="cur"):
             if user_subgroup == "0" and lesson["groupNumber"] != "":
                 groupNumber = f"{lesson['groupNumber']}-я подгруппа, "
 
+            teacherName = ' '.join(lesson['teacherName'].split())
+            lessonName = ' '.join(lesson['lessonName'].split())
+
             formatted_schedule += (
                 f"{numb_para} "
                 f"<em>({time_para})</em>\n"
-                f"{lesson['lessonName']}, "
+                f"{lessonName}, "
                 f"{audName}"
                 f"{lessonType}, "
                 f"{groupNumber}"
-                f"{lesson['teacherName']}\n\n"
+                f"{teacherName}\n\n"
             )
 
     return formatted_schedule
