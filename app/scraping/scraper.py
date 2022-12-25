@@ -93,7 +93,7 @@ async def get_data_from_getschedule(id):
     try:
         json_next_week = await parse_json(json_next_week, id)
     except ValueError as e:
-        json_cur_week = None
+        json_next_week = None
         logging.warning(e)
     return json_cur_week, json_next_week
 
