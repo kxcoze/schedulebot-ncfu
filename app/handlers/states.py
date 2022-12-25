@@ -75,7 +75,7 @@ async def state_set_user_group(message: types.Message, **kwargs):
         await state.finish()
         try:
             async with db_session() as session:
-                if group.schedule_cur_week is None or group.schedule_next_week is None:
+                if not group.schedule_cur_week or not group.schedule_next_week:
                     logging.info(f"loading schedule for {group.name} group")
                     (
                         group.schedule_cur_week,
