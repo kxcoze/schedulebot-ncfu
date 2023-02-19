@@ -1,7 +1,6 @@
-import json
 import re
 from abc import ABC, abstractmethod
-from typing import List, Tuple
+from typing import List
 
 from aiogram import types
 from aiogram.utils.callback_data import CallbackData

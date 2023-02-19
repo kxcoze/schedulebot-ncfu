@@ -69,12 +69,9 @@ async def parse_json(json_data, id):
 async def get_data_from_getschedule(id):
     url = "https://ecampus.ncfu.ru/schedule/GetSchedule"
     now = datetime.now() + timedelta(days=1)
-    monday_cur_week = (
-        now - timedelta(days=now.weekday())
-    ).strftime("%Y-%m-%d")
+    monday_cur_week = (now - timedelta(days=now.weekday())).strftime("%Y-%m-%d")
     monday_next_week = (
-        (now - timedelta(days=now.weekday()))
-        + timedelta(days=7)
+        (now - timedelta(days=now.weekday())) + timedelta(days=7)
     ).strftime("%Y-%m-%d")
     async with aiohttp.ClientSession() as session:
         params = {"date": monday_cur_week, "Id": id, "targetType": 2}
@@ -179,8 +176,8 @@ async def get_formatted_schedule(user, group, range, requested_week="cur"):
             if user_subgroup == "0" and lesson["groupNumber"] != "":
                 groupNumber = f"{lesson['groupNumber']}-я подгруппа, "
 
-            teacherName = ' '.join(lesson['teacherName'].split())
-            lessonName = ' '.join(lesson['lessonName'].split())
+            teacherName = " ".join(lesson["teacherName"].split())
+            lessonName = " ".join(lesson["lessonName"].split())
 
             formatted_schedule += (
                 f"{numb_para} "

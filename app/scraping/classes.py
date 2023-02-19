@@ -1,9 +1,7 @@
-import os
 import time
 import subprocess
 import logging
 
-import requests
 from bs4 import BeautifulSoup as BS4
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -14,6 +12,7 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 
 FIREFOX_BINARY = FirefoxBinary("/opt/firefox/firefox")
+# FIREFOX_BINARY = FirefoxBinary("firefox")
 
 PROFILE = webdriver.FirefoxProfile()
 PROFILE.set_preference("browser.cache.disk.enable", False)
@@ -82,7 +81,7 @@ class SelScrapingSchedule:
             "firefox_binary": FIREFOX_BINARY,
             "firefox_profile": PROFILE,
             "options": FIREFOX_OPTS,
-            "service_log_path": GECKODRIVER_LOG,
+            # "service_log_path": GECKODRIVER_LOG,
         }
         browser = webdriver.Firefox(**ff_opt)
         browser.get(url)

@@ -15,11 +15,14 @@ from inlinekeyboard import (
     cbd_poll,
     cbd_choice,
 )
+from decorators import add_message_id_in_db_for_group
 from handlers.states import PreferenceStates, LinksStates, HomeworkStates
 from bookclasses import Book, Links, Homework
 
 
-async def query_set_user_preferences(query: types.CallbackQuery, state: FSMContext):
+async def query_set_user_preferences(
+    query: types.CallbackQuery, state: FSMContext, **kwargs
+):
     await query.answer()
     await state.finish()
     text, markup = show_ikeyboard_preferences()
@@ -31,23 +34,24 @@ async def query_set_user_preferences(query: types.CallbackQuery, state: FSMConte
     )
 
 
+@add_message_id_in_db_for_group
 async def query_wait_user_time_preferences(
-    query: types.CallbackQuery, state: FSMContext
+    query: types.CallbackQuery, state: FSMContext, **kwargs
 ):
     answer = (
         "Укажите за сколько минут Вас уведомлять о начале пары \n"
         "(от 0 до 60 минут)\n"
     )
-    await query.bot.send_message(
+    await query.answer()
+    await PreferenceStates.add_time_preference.set()
+
+    return await query.bot.send_message(
         text=answer,
         chat_id=query.message.chat.id,
     )
 
-    await query.answer()
-    await PreferenceStates.add_time_preference.set()
 
-
-async def query_wait_user_type_preferences(query: types.CallbackQuery):
+async def query_wait_user_type_preferences(query: types.CallbackQuery, **kwargs):
     await query.answer()
     text, markup = show_type_preference_ikeyboard()
     await query.bot.edit_message_text(
@@ -59,7 +63,7 @@ async def query_wait_user_type_preferences(query: types.CallbackQuery):
 
 
 async def query_set_user_type_preferences(
-    query: types.CallbackQuery, callback_data: typing.Dict[str, str]
+    query: types.CallbackQuery, callback_data: typing.Dict[str, str], **kwargs
 ):
     db_session = query.bot.get("db")
     async with db_session() as session:
@@ -69,21 +73,22 @@ async def query_set_user_type_preferences(
     await query.answer("Успешно!")
 
 
+@add_message_id_in_db_for_group
 async def query_wait_user_subgroup_preferences(
-    query: types.CallbackQuery, state: FSMContext
+    query: types.CallbackQuery, state: FSMContext, **kwargs
 ):
     await query.answer()
     answer = "Укажите Вашу подгруппу от (0 до 9)\n"
-    await query.bot.send_message(
+    await PreferenceStates.add_subgroup_preference.set()
+    return await query.bot.send_message(
         text=answer,
         chat_id=query.message.chat.id,
     )
 
-    await PreferenceStates.add_subgroup_preference.set()
 
-
+@add_message_id_in_db_for_group
 async def query_wait_user_language_preferences(
-    query: types.CallbackQuery, state: FSMContext
+    query: types.CallbackQuery, state: FSMContext, **kwargs
 ):
     answer = (
         "Напишите язык, который Вам преподается на паре типа:\n"
@@ -92,17 +97,17 @@ async def query_wait_user_language_preferences(
         "<b><em>Английский</em></b> или <b><em>Русский</em></b>\n"
         "Если желаете убрать язык напишите одиночное тире: <b><em>-</em></b>"
     )
-    await query.bot.send_message(
+    await query.answer()
+    await PreferenceStates.add_language_preference.set()
+
+    return await query.bot.send_message(
         text=answer,
         chat_id=query.message.chat.id,
     )
-    await query.answer()
-
-    await PreferenceStates.add_language_preference.set()
 
 
 async def query_show_book_prev_next_page(
-    query: types.CallbackQuery, callback_data: typing.Dict[str, str]
+    query: types.CallbackQuery, callback_data: typing.Dict[str, str], **kwargs
 ):
     cur_page = int(callback_data["page_num"])
     if callback_data["name"] == "homework":
@@ -119,7 +124,7 @@ async def query_show_book_prev_next_page(
 
 
 async def query_show_link_info(
-    query: types.CallbackQuery, callback_data: typing.Dict[str, str]
+    query: types.CallbackQuery, callback_data: typing.Dict[str, str], **kwargs
 ):
     cur_page = int(callback_data["page_num"])
     ind = int(callback_data["id"]) - 1
@@ -152,8 +157,12 @@ async def query_show_link_info(
         await query.answer("Произошла непредвиденная ошибка.")
 
 
+@add_message_id_in_db_for_group
 async def query_add_data(
-    query: types.CallbackQuery, callback_data: typing.Dict[str, str], state: FSMContext
+    query: types.CallbackQuery,
+    callback_data: typing.Dict[str, str],
+    state: FSMContext,
+    **kwargs,
 ):
     async with state.proxy() as data:
         data["main"] = query.message.message_id
@@ -189,15 +198,20 @@ async def query_add_data(
             "'Cсылка на занятие'</b>"
         )
         await LinksStates.input_data.set()
-    await query.bot.send_message(
+    await query.answer()
+
+    return await query.bot.send_message(
         text=answer,
         chat_id=query.message.chat.id,
     )
-    await query.answer()
 
 
+@add_message_id_in_db_for_group
 async def query_edit_data(
-    query: types.CallbackQuery, callback_data: typing.Dict[str, str], state: FSMContext
+    query: types.CallbackQuery,
+    callback_data: typing.Dict[str, str],
+    state: FSMContext,
+    **kwargs,
 ):
 
     if callback_data["name"] == "homework":
@@ -240,18 +254,21 @@ async def query_edit_data(
         data["var"] = variant
         data["ind"] = ind
 
-    await query.bot.send_message(
+    return await query.bot.send_message(
         text=answer,
         chat_id=query.message.chat.id,
     )
 
 
 async def query_delete_data(
-    query: types.CallbackQuery, callback_data: typing.Dict[str, str], state: FSMContext
+    query: types.CallbackQuery,
+    callback_data: typing.Dict[str, str],
+    state: FSMContext,
+    **kwargs,
 ):
     await state.finish()
     if callback_data["name"] == "homework":
-        user_book = Homework(query.message.chat.id, query.bot.get("db"))
+        user_book = Homework(query.message.chat.id, query.tbot.get("db"))
         information = "Предмет"
         data_element = user_book.parse_msg(query.message.text)[0][1:]
     else:
@@ -280,7 +297,7 @@ async def query_delete_data(
 
 
 async def query_show_homework_info(
-    query: types.CallbackQuery, callback_data: typing.Dict[str, str]
+    query: types.CallbackQuery, callback_data: typing.Dict[str, str], **kwargs
 ):
     cur_page = int(callback_data["page_num"])
     ind = int(callback_data["id"]) - 1
@@ -319,7 +336,7 @@ async def query_show_homework_info(
 
 
 async def query_show_homework_detail_info(
-    query: types.CallbackQuery, callback_data: typing.Dict[str, str]
+    query: types.CallbackQuery, callback_data: typing.Dict[str, str], **kwargs
 ):
     ind_sub = int(callback_data["page_num"])
     ind_hmw = int(callback_data["id"]) - 1
@@ -353,8 +370,12 @@ async def query_show_homework_detail_info(
         await query.answer("Произошла непредвиденная ошибка.")
 
 
+@add_message_id_in_db_for_group
 async def query_additional_data(
-    query: types.CallbackQuery, callback_data: typing.Dict[str, str], state: FSMContext
+    query: types.CallbackQuery,
+    callback_data: typing.Dict[str, str],
+    state: FSMContext,
+    **kwargs,
 ):
     user_book = Homework(query.message.chat.id, query.bot.get("db"))
     data = user_book.parse_msg(query.message.text)[0]
@@ -394,14 +415,18 @@ async def query_additional_data(
     answer = "Введите данные для добавления новой домашки"
     await HomeworkStates.input_homework.set()
 
-    await query.bot.send_message(
+    return await query.bot.send_message(
         text=answer,
         chat_id=query.message.chat.id,
     )
 
 
+@add_message_id_in_db_for_group
 async def query_edit_detail_info(
-    query: types.CallbackQuery, callback_data: typing.Dict[str, str], state: FSMContext
+    query: types.CallbackQuery,
+    callback_data: typing.Dict[str, str],
+    state: FSMContext,
+    **kwargs,
 ):
 
     user_book = Homework(query.message.chat.id, query.bot.get("db"))
@@ -444,7 +469,7 @@ async def query_edit_detail_info(
     answer = "Введите новые данные для домашки"
     await HomeworkStates.edit_homework.set()
 
-    await query.bot.send_message(
+    return await query.bot.send_message(
         text=answer,
         chat_id=query.message.chat.id,
         parse_mode="HTML",
@@ -452,7 +477,10 @@ async def query_edit_detail_info(
 
 
 async def query_delete_homework(
-    query: types.CallbackQuery, callback_data: typing.Dict[str, str], state: FSMContext
+    query: types.CallbackQuery,
+    callback_data: typing.Dict[str, str],
+    state: FSMContext,
+    **kwargs,
 ):
     await state.finish()
 

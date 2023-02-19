@@ -1,7 +1,3 @@
-from typing import List
-
-from db.models import User
-
 LANGUAGES = [
     "Азербайджанский",
     "Нидерландский",
@@ -55,20 +51,6 @@ LANGUAGES = [
 ]
 
 
-def check_existing_user(func):
-    async def wrapped(*args, **kwargs):
-        message = args[0]
-        db_session = message.bot.get("db")
-        async with db_session() as session:
-            user: User = await session.get(User, message.chat.id)
-            if not user:
-                await session.merge(User(id=message.chat.id))
-                await session.commit()
-        return await func(*args, **kwargs)
-
-    return wrapped
-
-
 def get_formatted_schedule_bell():
     bell = _get_schedule_bell_ncfu()
     formatted_bell = "<b><em>Расписание звонков СКФУ</em></b>\n"
@@ -83,7 +65,7 @@ def get_formatted_schedule_bell():
     return formatted_bell
 
 
-def get_every_aliases_days_week() -> [List, List]:
+def get_every_aliases_days_week():
     fweekdays = list(_get_eng_days_week().keys())
     result = fweekdays.copy()
     second_result = []

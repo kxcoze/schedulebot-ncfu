@@ -23,9 +23,25 @@ class User(Base):
 
 class Group(Base):
     __tablename__ = "group"
+
     id = Column(Integer, primary_key=True, unique=True, autoincrement=False)
     name = Column(String(20), unique=True, index=True)
     schedule_cur_week = Column(JSON)
     schedule_next_week = Column(JSON)
 
     users = relationship("User", backref="group", lazy="dynamic")
+
+
+class Chat(Base):
+    __tablename__ = "chat"
+
+    id = Column(BigInteger, primary_key=True)
+    messages = relationship("Message", back_populates="chat")
+
+
+class Message(Base):
+    __tablename__ = "message"
+
+    id = Column(BigInteger, primary_key=True)
+    chat_id = Column(BigInteger, ForeignKey("chat.id"))
+    chat = relationship("Chat", back_populates="messages")

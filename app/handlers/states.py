@@ -9,7 +9,8 @@ from sqlalchemy import select
 
 from db.models import User, Group
 from scraping.scraper import get_data_from_getschedule
-from helpers import check_existing_user, LANGUAGES
+from helpers import LANGUAGES
+from decorators import check_existing_user, add_message_id_in_db_for_group
 from bookclasses import Links, Homework
 
 
@@ -38,6 +39,7 @@ class HomeworkStates(StatesGroup):
 
 
 @check_existing_user
+@add_message_id_in_db_for_group
 async def state_set_user_group(message: types.Message, **kwargs):
     state = kwargs["state"]
 
@@ -47,8 +49,7 @@ async def state_set_user_group(message: types.Message, **kwargs):
     try:
         group_name = regroup.search(f"{message.text} ").groups()[0].lower().strip()
     except AttributeError:
-        await message.reply("Введен неверный формат группы!")
-        return
+        return await message.reply("Введен неверный формат группы!")
 
     # Регулярное выражение для поиска подгруппы
     resubgroup = re.compile(".*[\s|(](\d)")
@@ -108,11 +109,14 @@ async def state_set_user_group(message: types.Message, **kwargs):
                 text="Произошла непредвиденная ошибка!\n"
                 "Пожалуйста, попробуйте позже.",
             )
+        finally:
+            return answer_success
     else:
-        await message.reply("Введенная группа не существует, попробуйте снова")
+        return await message.reply("Введенная группа не существует, попробуйте снова")
 
 
 @check_existing_user
+@add_message_id_in_db_for_group
 async def state_set_time_preferences(message: types.Message, **kwargs):
     state = kwargs["state"]
     if message.text.isdigit() and 0 <= int(message.text) <= 60:
@@ -121,16 +125,17 @@ async def state_set_time_preferences(message: types.Message, **kwargs):
             user: User = await session.get(User, message.chat.id)
             user.pref_time = int(message.text)
             await session.commit()
-        await message.answer(
+        await state.finish()
+        return await message.answer(
             "Время успешно установлено!\n"
             "Текущие настройки можно посмотреть с помощью команды /settings"
         )
-        await state.finish()
     else:
-        await message.answer("Вы ввели не подходящее число!")
+        return await message.answer("Вы ввели не подходящее число!")
 
 
 @check_existing_user
+@add_message_id_in_db_for_group
 async def state_set_user_subgroup_preferences(message: types.Message, **kwargs):
     state = kwargs["state"]
     if message.text.isdigit() and 0 <= int(message.text) <= 9:
@@ -139,29 +144,29 @@ async def state_set_user_subgroup_preferences(message: types.Message, **kwargs):
             user: User = await session.get(User, message.chat.id)
             user.subgroup = int(message.text)
             await session.commit()
-        await message.answer(
+        await state.finish()
+        return await message.answer(
             "Подгруппа успешно установлена!\n"
             "Текущие настройки можно посмотреть с помощью команды /settings"
         )
-        await state.finish()
     else:
-        await message.answer("Вы ввели не подходящее число!")
+        return await message.answer("Вы ввели не подходящее число!")
 
 
 @check_existing_user
+@add_message_id_in_db_for_group
 async def state_set_user_language_preferences(message: types.Message, **kwargs):
     state = kwargs["state"]
     # Добавить обработку отсутствия пользователя в БД
     msg = message.text.split()[0]
     if not msg.isalpha() and msg != "-":
-        await message.answer("Вы ввели не строку! Попробуйте ещё раз.")
-        return
+        return await message.answer("Вы ввели не строку! Попробуйте ещё раз.")
     elif len(msg) > 30:
-        await message.answer("Такое кол-во символов недопустимо! Попробуйте ещё раз.")
-        return
+        return await message.answer(
+            "Такое кол-во символов недопустимо! Попробуйте ещё раз."
+        )
     elif msg.capitalize() not in LANGUAGES:
-        await message.answer("Данный язык отсутствует. Введите другой язык")
-        return
+        return await message.answer("Данный язык отсутствует. Введите другой язык")
     elif msg == "-":
         msg = ""
 
@@ -171,14 +176,17 @@ async def state_set_user_language_preferences(message: types.Message, **kwargs):
         user.foreign_lan = msg.capitalize()
         await session.commit()
 
-    await message.answer(
+    await state.finish()
+    return await message.answer(
         "Язык успешно установлен!\n"
         "Текущие настройки можно посмотреть с помощью команды /settings"
     )
-    await state.finish()
 
 
-async def state_process_user_message_link(message: types.Message, state: FSMContext):
+@add_message_id_in_db_for_group
+async def state_process_user_message_link(
+    message: types.Message, state: FSMContext, **kwargs
+):
     message_text = message.text.split("\n")
     searched_data = []
     for text in message_text:
@@ -188,22 +196,16 @@ async def state_process_user_message_link(message: types.Message, state: FSMCont
             searched_data.append(text)
 
     if len(searched_data) < 2:
-        await message.bot.send_message(
+        return await message.bot.send_message(
             text="Введенных данных недостаточно для добавления ссылки!",
             chat_id=message.chat.id,
         )
-        return
 
     async with state.proxy() as data:
         user_book = Links(message.chat.id, message.bot.get("db"))
         cur_page = data["page_num"]
         result = await user_book.append_data(*searched_data, cur_page * user_book.WIDTH)
         if result == 0:
-            await message.bot.send_message(
-                text="Ссылка успешно добавлена!",
-                chat_id=message.chat.id,
-                reply_markup=user_book.back_to_main(cur_page, "links"),
-            )
             text, markup = await user_book.show_page(cur_page)
             try:
                 await message.bot.edit_message_text(
@@ -216,8 +218,14 @@ async def state_process_user_message_link(message: types.Message, state: FSMCont
                 # Информация на странице не изменилась
                 pass
             await state.finish()
+            return await message.bot.send_message(
+                text="Ссылка успешно добавлена!",
+                chat_id=message.chat.id,
+                reply_markup=user_book.back_to_main(cur_page, "links"),
+            )
         elif result == -1:
-            await message.bot.send_message(
+            await state.finish()
+            return await message.bot.send_message(
                 text=(
                     "Ваших ссылок стало слишком много, "
                     "удалите лишние с помощью кнопки "
@@ -225,14 +233,13 @@ async def state_process_user_message_link(message: types.Message, state: FSMCont
                 ),
                 chat_id=message.chat.id,
             )
-            await state.finish()
         else:
-            await message.bot.send_message(
+            return await message.bot.send_message(
                 text="Что-то пошло не так, попробуйте снова!", chat_id=message.chat.id
             )
 
 
-async def state_edit_link(message: types.Message, state: FSMContext):
+async def state_edit_link(message: types.Message, state: FSMContext, **kwargs):
     message_text = message.text.split("\n")[0]
     user_book = Links(message.chat.id, message.bot.get("db"))
     async with state.proxy() as data:
@@ -257,8 +264,9 @@ async def state_edit_link(message: types.Message, state: FSMContext):
         await state.finish()
 
 
+@add_message_id_in_db_for_group
 async def state_process_user_message_homework(
-    message: types.Message, state: FSMContext
+    message: types.Message, state: FSMContext, **kwargs
 ):
     message_text = message.text.split("\n")
     searched_data = []
@@ -267,11 +275,10 @@ async def state_process_user_message_homework(
             searched_data.append(text)
 
     if not searched_data:
-        await message.bot.send_message(
+        return await message.bot.send_message(
             text="Введенных данных недостаточно для добавления домашки!",
             chat_id=message.chat.id,
         )
-        return
 
     async with state.proxy() as data:
         cur_page = data["page_num"]
@@ -285,11 +292,6 @@ async def state_process_user_message_homework(
         pos=cur_page * user_book.WIDTH,
     )
     if result == 0:
-        await message.bot.send_message(
-            text="Предмет успешно добавлен!",
-            chat_id=message.chat.id,
-            reply_markup=user_book.back_to_main(cur_page, "homework"),
-        )
         text, markup = await user_book.show_page(cur_page)
         try:
             await message.bot.edit_message_text(
@@ -302,8 +304,14 @@ async def state_process_user_message_homework(
             # Информация на странице не изменилась
             pass
         await state.finish()
+        return await message.bot.send_message(
+            text="Предмет успешно добавлен!",
+            chat_id=message.chat.id,
+            reply_markup=user_book.back_to_main(cur_page, "homework"),
+        )
     elif result == -1:
-        await message.bot.send_message(
+        await state.finish()
+        return await message.bot.send_message(
             text=(
                 "Ваших предметов стало слишком много,"
                 "удалите лишние с помощью кнопки "
@@ -311,15 +319,15 @@ async def state_process_user_message_homework(
             ),
             chat_id=message.chat.id,
         )
-        await state.finish()
     else:
-        await message.bot.send_message(
+        return await message.bot.send_message(
             text="Что-то пошло не так, попробуйте снова!", chat_id=message.chat.id
         )
 
 
+@add_message_id_in_db_for_group
 async def state_process_user_homework_detail_info(
-    message: types.Message, state: FSMContext
+    message: types.Message, state: FSMContext, **kwargs
 ):
     message_text = message.text.split("\n")[0]
 
@@ -334,10 +342,6 @@ async def state_process_user_homework_detail_info(
         ind=ind,
     )
     if result == 0:
-        await message.bot.send_message(
-            text="Домашка успешно добавлена!",
-            chat_id=message.chat.id,
-        )
         text, markup = await user_book.view_data_element(cur_page, ind)
         try:
             await message.bot.edit_message_text(
@@ -350,8 +354,13 @@ async def state_process_user_homework_detail_info(
             # Информация на странице не изменилась
             pass
         await state.finish()
+        return await message.bot.send_message(
+            text="Домашка успешно добавлена!",
+            chat_id=message.chat.id,
+        )
     elif result == -1:
-        await message.bot.send_message(
+        await state.finish()
+        return await message.bot.send_message(
             text=(
                 "Ваших домашек стало слишком много, "
                 "удалите лишние с помощью кнопки "
@@ -360,14 +369,13 @@ async def state_process_user_homework_detail_info(
             chat_id=message.chat.id,
             parse_mode="HTML",
         )
-        await state.finish()
     else:
-        await message.bot.send_message(
+        return await message.bot.send_message(
             text="Что-то пошло не так, попробуйте снова!", chat_id=message.chat.id
         )
 
 
-async def state_edit_homework(message: types.Message, state: FSMContext):
+async def state_edit_homework(message: types.Message, state: FSMContext, **kwargs):
     message_text = message.text.split("\n")[0]
     user_book = Homework(message.chat.id, message.bot.get("db"))
     async with state.proxy() as data:
@@ -391,7 +399,9 @@ async def state_edit_homework(message: types.Message, state: FSMContext):
     await state.finish()
 
 
-async def state_edit_homework_detail_info(message: types.Message, state: FSMContext):
+async def state_edit_homework_detail_info(
+    message: types.Message, state: FSMContext, **kwargs
+):
     message_text = message.text.split("\n")[0]
     user_book = Homework(message.chat.id, message.bot.get("db"))
     async with state.proxy() as data:

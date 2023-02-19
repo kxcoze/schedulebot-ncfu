@@ -7,8 +7,9 @@ from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommand
 from aiogram.types.bot_command_scope import BotCommandScopeDefault
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.pool import NullPool
 import aiolog
 
 from db.models import Base, Group
@@ -26,10 +27,7 @@ async def set_bot_commands(bot: Bot):
     commands = [
         BotCommand(command="help", description="Просмотр всех команд"),
         BotCommand(command="setgroup", description="Ввод группы для показа расписания"),
-        BotCommand(command="links", description="Интерфейс для работы со ссылками"),
-        BotCommand(
-            command="homework", description="Интерфейс для записи домашних заданий"
-        ),
+        BotCommand(command="settings", description="Посмотреть текущие настройки"),
         BotCommand(
             command="notifyme", description="Подписаться на уведомления о начале пары"
         ),
@@ -38,10 +36,13 @@ async def set_bot_commands(bot: Bot):
             command="setpreferences",
             description="Настройка предпочтений по уведомлениям",
         ),
-        BotCommand(command="settings", description="Посмотреть текущие настройки"),
         BotCommand(command="bell", description="Посмотреть расписание звонков"),
+        BotCommand(command="links", description="Интерфейс для работы со ссылками"),
+        BotCommand(
+            command="homework", description="Интерфейс для записи домашних заданий"
+        ),
         BotCommand(command="today", description="Посмотреть расписание на сегодня"),
-        BotCommand(command="tommorow", description="Посмотреть расписание на завтра"),
+        BotCommand(command="tomorrow", description="Посмотреть расписание на завтра"),
         BotCommand(command="week", description="Посмотреть расписание на неделю"),
         BotCommand(command="monday", description="Просмотр расписания на понедельник"),
         BotCommand(command="tuesday", description="Просмотр расписания на вторник"),
@@ -49,6 +50,7 @@ async def set_bot_commands(bot: Bot):
         BotCommand(command="thursday", description="Просмотр расписания на четверг"),
         BotCommand(command="friday", description="Просмотр расписания на пятницу"),
         BotCommand(command="saturday", description="Просмотр расписания на субботу"),
+        BotCommand(command="clear", description="Очистка сообщений бpта в беседе"),
         BotCommand(
             command="nextweek", description="Посмотреть расписание на следующую неделю"
         ),
@@ -86,6 +88,7 @@ async def main():
             f"postgresql+asyncpg://{config.db.user}:{config.db.password}@{config.db.host}/{config.db.db_name}",
         json_serializer=lambda obj: json.dumps(obj, ensure_ascii=False),
         future=True,
+        poolclass=NullPool,
     )
 
     async with engine.begin() as conn:
@@ -114,12 +117,14 @@ async def main():
 
     bot = Bot(config.bot.token, parse_mode="HTML")
     bot["db"] = async_sessionmaker
+    Bot.set_current(bot)
     dp = Dispatcher(bot, storage=MemoryStorage())
-
     register_commands(dp)
     register_callbacks(dp)
     register_states(dp)
     await set_bot_commands(bot)
+
+    init_taskmanager()
 
     aiolog.start()
     logging.error("BOT STARTED!")
@@ -134,7 +139,6 @@ async def main():
 
 if __name__ == "__main__":
     try:
-        init_taskmanager()
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logging.error("Bot stopped!")

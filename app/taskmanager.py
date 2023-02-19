@@ -1,9 +1,7 @@
-import os
 import threading
 import json
 import asyncio
 import logging
-import time
 from datetime import datetime, timedelta
 
 import schedule
@@ -12,19 +10,22 @@ from aiogram.utils import exceptions
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import NullPool
 
 from scraping.scraper import get_data_from_getschedule, get_codes
 from db.models import User, Group
 from config import load_config, Config
 from helpers import _get_schedule_bell_ncfu
+from decorators import add_message_id_in_db_for_group
 
 
 def init_engine_and_bot():
     config: Config = load_config()
     engine = create_async_engine(
-            f"postgresql+asyncpg://{config.db.user}:{config.db.password}@{config.db.host}/{config.db.db_name}",
+        f"postgresql+asyncpg://{config.db.user}:{config.db.password}@{config.db.host}/{config.db.db_name}",
         json_serializer=lambda obj: json.dumps(obj, ensure_ascii=False),
         future=True,
+        poolclass=NullPool,
     )
 
     async_sessionmaker = sessionmaker(
@@ -36,15 +37,17 @@ def init_engine_and_bot():
     return bot
 
 
-bot = init_engine_and_bot()
-
-
+@add_message_id_in_db_for_group
 async def send_message(
-    user_id: int, text: str, disable_notification: bool = False
+    user_id: int, text: str, disable_notification: bool = False, **kwargs
 ) -> bool:
 
+    msg = await bot.send_message(
+        user_id, text, disable_notification=disable_notification
+    )
     try:
-        await bot.send_message(user_id, text, disable_notification=disable_notification)
+        # msg = await bot.send_message(user_id, text, disable_notification=disable_notification)
+        pass
     except exceptions.BotBlocked:
         logging.error(f"Target [ID:{user_id}]: blocked by user")
     except exceptions.ChatNotFound:
@@ -62,8 +65,8 @@ async def send_message(
         logging.exception(f"Target [ID:{user_id}]: failed")
     else:
         logging.info(f"Target [ID:{user_id}]: success")
-        return True
-    return False
+        return msg
+    return None
 
 
 async def update_groups_schedules():
@@ -112,7 +115,11 @@ async def prepare_receivers(cur_lesson):
     verification_time = (lesson_start - now).seconds // 60
     db_session = bot.get("db")
     async with db_session() as session:
-        sql = select(User).where(User.is_notified==True, User.group_id.is_not(None), User.pref_time==verification_time)
+        sql = select(User).where(
+            User.is_notified == True,
+            User.group_id.is_not(None),
+            User.pref_time == verification_time,
+        )
         users = [user[0] for user in (await session.execute(sql)).fetchall()]
 
         users_group_id = set([user.group_id for user in users])
@@ -217,17 +224,18 @@ async def send_message_to_users(cur_lesson):
     receivers = await prepare_receivers(cur_lesson)
     count = 0
     if receivers:
+        for user in receivers:
+            msg = await send_message(user["user_id"], user["message"])
+            if msg is not None:
+                count += 1
+            # 20 messages per second (Limit: 30 messages per second)
+            await asyncio.sleep(0.05)
         try:
-            for user in receivers:
-                if await send_message(user["user_id"], user["message"]):
-                    count += 1
-                # 20 messages per second (Limit: 30 messages per second)
-                await asyncio.sleep(0.05)
+            pass
         finally:
             logging.info(f"{count} messages successful sent.")
     else:
-        pass
-        # logging.info("No users to send message.")
+        logging.info("No users to send message.")
 
 
 async def update_group_codes():
@@ -282,7 +290,6 @@ def planning_tasks():
     # Обновить расписание хранящиеся в БД
     schedule.every().sunday.at("00:00:00").do(prepare_to_update_groups_schedule)
 
-
     # Обновить коды университета
     schedule.every(10).weeks.do(prepare_to_update_group_codes)
 
@@ -299,6 +306,8 @@ def start_background_eventloop(loop):
 
 
 def init_taskmanager():
+    global bot
+    bot = init_engine_and_bot()
     loop = asyncio.new_event_loop()
     planning_tasks()
     threading.Thread(

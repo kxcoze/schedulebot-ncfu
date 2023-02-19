@@ -1,27 +1,30 @@
 import re
 import logging
+from typing import List
 
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext, filters
 from aiogram.dispatcher.filters.state import State, StatesGroup
+from aiogram.utils.exceptions import MessageToDeleteNotFound
 
-from db.models import User, Group
+from db.models import User, Group, Chat, Message
 from scraping.scraper import get_formatted_schedule
 from inlinekeyboard import show_ikeyboard_preferences, cbd_poll, cbd_choice
 from handlers.states import SetGroupStates, PreferenceStates
 from helpers import (
-    check_existing_user,
     _get_meaning_of_preferences,
     get_every_aliases_days_week,
     get_formatted_schedule_bell,
 )
-from bookclasses import Book, Links, Homework
+from decorators import check_existing_user, add_message_id_in_db_for_group
+from bookclasses import Links, Homework
 
 
+@add_message_id_in_db_for_group
 async def cmd_start(message: types.Message, **kwargs):
     """Приветствие от бота по команде /start"""
-    await message.answer(
+    return await message.answer(
         "Привет! \n"
         "Я бот для расписаний СКФУ! \n"
         "Для начала загрузите расписание с помощью команды /setgroup \n"
@@ -38,12 +41,13 @@ async def cmd_start(message: types.Message, **kwargs):
     )
 
 
+@add_message_id_in_db_for_group
 async def cmd_help(message: types.Message, **kwargs):
     """Вывод всех возможных команд бота"""
     state = kwargs["state"]
 
     await state.finish()
-    await message.answer(
+    return await message.answer(
         "<b><em>Список всех команд:</em></b> \n"
         "<em>Команды для настройки бота:</em> \n"
         "/setgroup - Ввод группы для показа расписания \n"
@@ -71,6 +75,7 @@ async def cmd_help(message: types.Message, **kwargs):
 
 
 @check_existing_user
+@add_message_id_in_db_for_group
 async def cmd_settings(message: types.Message, **kwargs):
     state = kwargs["state"]
 
@@ -89,7 +94,7 @@ async def cmd_settings(message: types.Message, **kwargs):
     pref_time = user.pref_time
     notification_type = _get_meaning_of_preferences()[user.notification_type]
     foreign_lan = user.foreign_lan.capitalize() if user.foreign_lan else "Отсутствует"
-    await message.answer(
+    return await message.answer(
         "<em><b>Ваши настройки</b></em>\n"
         f"Название группы: <b>{group_name}</b>\n"
         f"Номер подгруппы: <b>{subgroup}</b>\n"
@@ -102,8 +107,11 @@ async def cmd_settings(message: types.Message, **kwargs):
     )
 
 
+@add_message_id_in_db_for_group
 async def cmd_wait_user_group(message: types.Message, **kwargs):
-    await message.reply(
+    await SetGroupStates.waiting_for_group_name.set()
+
+    return await message.reply(
         "Введите название группы (в любом регистре) и укажите "
         "номер подгруппы (можно оставить пустым), например:\n"
         "<em>ЭКП-б-о-19-1</em> \n"
@@ -111,10 +119,9 @@ async def cmd_wait_user_group(message: types.Message, **kwargs):
         "<em>тбо-б-о-21-1 2</em> \n"
     )
 
-    await SetGroupStates.waiting_for_group_name.set()
-
 
 @check_existing_user
+@add_message_id_in_db_for_group
 async def cmd_show_schedule(message: types.Message, **kwargs):
     regexp_command = kwargs.get("regexp_command")
     week = "cur"
@@ -140,18 +147,20 @@ async def cmd_show_schedule(message: types.Message, **kwargs):
             group = res.fetchone()[0]
         if group.schedule_cur_week:
             schedule = await get_formatted_schedule(user, group, command, week)
-            await message.answer(schedule, parse_mode="HTML")
+            msg = await message.answer(schedule, parse_mode="HTML")
         else:
-            await message.answer("Расписания нет, загрузите командой /setgroup")
+            msg = await message.answer("Расписания нет, загрузите командой /setgroup")
     else:
-        await message.reply(
+        msg = await message.reply(
             "Похоже что Вы не выбрали группу перед тем как "
             "посмотреть расписание, пожалуйста, воспользуйтесь "
             "командой /setgroup и укажите Вашу группу"
         )
+    return msg
 
 
 @check_existing_user
+@add_message_id_in_db_for_group
 async def cmd_notify_user(message: types.Message, **kwargs):
     db_session = message.bot.get("db")
     async with db_session() as session:
@@ -161,7 +170,7 @@ async def cmd_notify_user(message: types.Message, **kwargs):
 
     pref_time = user.pref_time
     pref_type_lesson = _get_meaning_of_preferences()[user.notification_type]
-    await message.reply(
+    return await message.reply(
         "Вы успешно подписались на уведомления о начале пары! \n\n"
         f"Время за которое Вас уведомлять о начале пары: <b>{pref_time}</b> мин.\n"
         f"Уведомляемый тип пар: <b>{pref_type_lesson}</b> \n"
@@ -170,52 +179,74 @@ async def cmd_notify_user(message: types.Message, **kwargs):
 
 
 @check_existing_user
+@add_message_id_in_db_for_group
 async def cmd_stop_notify_user(message: types.Message, **kwargs):
     db_session = message.bot.get("db")
     async with db_session() as session:
         user: User = await session.get(User, message.chat.id)
         user.is_notified = False
         await session.commit()
-    await message.reply("Вы отписались от уведомлений о начале пары!")
+    return await message.reply("Вы отписались от уведомлений о начале пары!")
 
 
+@add_message_id_in_db_for_group
 async def cmd_send_ncfu_bells(message: types.Message, **kwargs):
-    await message.answer(get_formatted_schedule_bell())
+    return await message.answer(get_formatted_schedule_bell())
 
 
 @check_existing_user
+@add_message_id_in_db_for_group
 async def cmd_set_user_preferences(message: types.Message, **kwargs):
     state = kwargs["state"]
     text, markup = show_ikeyboard_preferences()
-    await message.answer(
+    await state.finish()
+    return await message.answer(
         text,
         reply_markup=markup,
     )
-    await state.finish()
 
 
 @check_existing_user
+@add_message_id_in_db_for_group
 async def cmd_show_interface_links(message: types.Message, **kwargs):
     state = kwargs["state"]
     user_book = Links(message.chat.id, message.bot.get("db"))
     text, markup = await user_book.show_page()
-    await message.answer(
+    await state.finish()
+    return await message.answer(
         text=text,
         reply_markup=markup,
     )
-    await state.finish()
 
 
 @check_existing_user
+@add_message_id_in_db_for_group
 async def cmd_show_interface_homework(message: types.Message, **kwargs):
     state = kwargs["state"]
     user_book = Homework(message.chat.id, message.bot.get("db"))
     text, markup = await user_book.show_page()
-    await message.answer(
+    await state.finish()
+    return await message.answer(
         text=text,
         reply_markup=markup,
     )
-    await state.finish()
+
+
+async def cmd_clear_bot_messages_from_group(message: types.Message, **kwargs):
+    db_session = message.bot.get("db")
+    async with db_session() as session:
+        stmt = select(Message).join(Chat).filter(Chat.id == message.chat.id)
+        messages: List[Message] = await session.scalars(stmt)
+        msgs = [msg.id for msg in messages]
+        for msg_id in msgs:
+            try:
+                await message.bot.delete_message(message.chat.id, msg_id)
+            except MessageToDeleteNotFound:
+                logging.info(f"{msg_id} is already deleted!")
+
+        stmt = delete(Message).where(Message.id.in_(msgs))
+        await session.execute(stmt)
+        await session.commit()
 
 
 (
@@ -234,7 +265,7 @@ def register_commands(dp: Dispatcher):
     )
     dp.register_message_handler(
         cmd_show_schedule,
-        commands=["today", "tommorow", "tom"] + main_commands_viewing_schedule,
+        commands=["today", "tomorrow", "tom"] + main_commands_viewing_schedule,
     )
     dp.register_message_handler(cmd_notify_user, commands=["notifyme"])
     dp.register_message_handler(cmd_stop_notify_user, commands=["stopnotifyme"])
@@ -244,3 +275,4 @@ def register_commands(dp: Dispatcher):
     dp.register_message_handler(
         cmd_show_interface_homework, commands=["homework"], state="*"
     )
+    dp.register_message_handler(cmd_clear_bot_messages_from_group, commands=["clear"])
