@@ -125,7 +125,7 @@ async def get_formatted_schedule(user, group, range, requested_week="cur"):
 
     if range == "today":
         weekday = "сегодня"
-    elif range == "tommorow":
+    elif range == "tomorrow":
         weekday = "завтра"
     else:
         week_to_work = "" if requested_week == "cur" else "следующий"
