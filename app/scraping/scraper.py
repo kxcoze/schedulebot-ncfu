@@ -102,7 +102,7 @@ async def get_formatted_schedule(user, group, range, requested_week="cur"):
 
     today = datetime.today().isoweekday() - 1
     tom = 0 if today + 1 > 6 else today + 1
-    date_dict = {"today": today, "tommorow": tom, "week": -1}
+    date_dict = {"today": today, "tomorrow": tom, "week": -1}
     date_dict.update(_get_eng_days_week())
 
     days_week = {
