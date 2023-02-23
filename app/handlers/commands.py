@@ -7,7 +7,7 @@ from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext, filters
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.utils.exceptions import MessageToDeleteNotFound
-from aiogram.utils.exceptions import MessageCantBeDeleted 
+from aiogram.utils.exceptions import MessageCantBeDeleted
 
 from db.models import User, Group, Chat, Message
 from scraping.scraper import get_formatted_schedule
@@ -58,7 +58,6 @@ async def cmd_help(message: types.Message, **kwargs):
         "/settings - Посмотреть текущие настройки \n"
         "/bell - Посмотреть расписание звонков \n"
         "/clear - Очистить сообщения бота в беседе\n\n"
-
         "<em>Команды для просмотра расписания:</em> \n"
         "/today - Посмотреть расписание на сегодня \n"
         "/tomorrow или /tom - Посмотреть расписание на завтра \n"
@@ -71,7 +70,6 @@ async def cmd_help(message: types.Message, **kwargs):
         "/thursday или /thu - Просмотр расписания на четверг \n"
         "/friday или /fri - Просмотр расписания на пятницу \n"
         "/saturday или /sat - Просмотр расписания на субботу \n\n"
-
         "<em>Опциональные команды: </em> \n"
         "/links - Интерфейс для работы со ссылками \n"
         "/homework - Интерфейс для записи домашних заданий \n"
@@ -248,7 +246,9 @@ async def cmd_clear_bot_messages_from_group(message: types.Message, **kwargs):
             except MessageToDeleteNotFound:
                 logging.info(f"{msg_id} is already deleted!")
             except MessageCantBeDeleted:
-                await message.bot.edit_message_text('<em>Удалено</em>', message.chat.id, msg_id)
+                await message.bot.edit_message_text(
+                    "<em>Удалено</em>", message.chat.id, msg_id
+                )
                 logging.info(f"Bot cannot delete {msg_id} so just replace it")
 
         stmt = delete(Message).where(Message.id.in_(msgs))
