@@ -248,7 +248,7 @@ async def cmd_clear_bot_messages_from_group(message: types.Message, **kwargs):
             except MessageToDeleteNotFound:
                 logging.info(f"{msg_id} is already deleted!")
             except MessageCantBeDeleted:
-                await message.bot.edit_message_text('<em>Удалено</em>', message.chat.id, msg_id, reply_markup='html')
+                await message.bot.edit_message_text('Удалено', message.chat.id, msg_id)
                 logging.info(f"Bot cannot delete {msg_id} so just replace it")
 
         stmt = delete(Message).where(Message.id.in_(msgs))
