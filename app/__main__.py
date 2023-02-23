@@ -50,7 +50,7 @@ async def set_bot_commands(bot: Bot):
         BotCommand(command="thursday", description="Просмотр расписания на четверг"),
         BotCommand(command="friday", description="Просмотр расписания на пятницу"),
         BotCommand(command="saturday", description="Просмотр расписания на субботу"),
-        BotCommand(command="clear", description="Очистка сообщений бpта в беседе"),
+        BotCommand(command="clear", description="Очистка сообщений бота в беседе"),
         BotCommand(
             command="nextweek", description="Посмотреть расписание на следующую неделю"
         ),

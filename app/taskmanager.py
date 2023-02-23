@@ -42,12 +42,10 @@ async def send_message(
     user_id: int, text: str, disable_notification: bool = False, **kwargs
 ) -> bool:
 
-    msg = await bot.send_message(
-        user_id, text, disable_notification=disable_notification
-    )
     try:
-        # msg = await bot.send_message(user_id, text, disable_notification=disable_notification)
-        pass
+        msg = await bot.send_message(
+            user_id, text, disable_notification=disable_notification
+        )
     except exceptions.BotBlocked:
         logging.error(f"Target [ID:{user_id}]: blocked by user")
     except exceptions.ChatNotFound:

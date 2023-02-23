@@ -7,6 +7,7 @@ from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext, filters
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.utils.exceptions import MessageToDeleteNotFound
+from aiogram.utils.exceptions import MessageCantBeDeleted 
 
 from db.models import User, Group, Chat, Message
 from scraping.scraper import get_formatted_schedule
@@ -246,6 +247,9 @@ async def cmd_clear_bot_messages_from_group(message: types.Message, **kwargs):
                 await message.bot.delete_message(message.chat.id, msg_id)
             except MessageToDeleteNotFound:
                 logging.info(f"{msg_id} is already deleted!")
+            except MessageCantBeDeleted:
+                await message.bot.edit_message_text('<em>Удалено</em>', message.chat.id, msg_id, reply_markup='html')
+                logging.info(f"Bot cannot delete {msg_id} so just replace it")
 
         stmt = delete(Message).where(Message.id.in_(msgs))
         await session.execute(stmt)
