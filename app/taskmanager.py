@@ -59,6 +59,13 @@ async def send_message(
         return await send_message(user_id, text)  # Recursive call
     except exceptions.UserDeactivated:
         logging.error(f"Target [ID:{user_id}]: user is deactivated")
+    except exceptions.MigrateToChat as e:
+        logging.error(
+            f"""
+            Target [ID:{user_id}]: failed because migrated to a new group with id: {e.migrate_to_chat_id}
+            This shit must be solved with a handler for the updates!
+            """
+        )
     except exceptions.TelegramAPIError:
         logging.exception(f"Target [ID:{user_id}]: failed")
     else:

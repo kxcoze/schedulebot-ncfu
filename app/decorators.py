@@ -20,7 +20,7 @@ def add_message_id_in_db_for_group(func):
     async def wrapped(*args, **kwargs):
         message = await func(*args, **kwargs)
         bot = Bot.get_current()
-        if message is not None and message.chat.type in {"group", "channel"}:
+        if message is not None and message.chat.type != 'private':
             db_session = bot.get("db")
             async with db_session() as session:
                 chat: Chat = await session.get(Chat, message.chat.id)
